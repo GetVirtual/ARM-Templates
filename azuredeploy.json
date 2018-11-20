@@ -9,9 +9,6 @@
                 "West Europe",
                 "North Europe"]
         },
-        "networkInterfaceName": {
-            "type": "string"
-        },
         "networkSecurityGroupName": {
             "type": "string"
         },
@@ -88,7 +85,8 @@
     "variables": {
         "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "networkInterfaceName": "vmnic"
     },
     "resources": [
         {
