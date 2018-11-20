@@ -3,8 +3,14 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "string"
-            "defaultValue": "West Europe"
+            "type": "string",
+            "defaultValue": "West Europe",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Standard_GRS",
+                "Standard_RAGRS",
+                "Premium_LRS"],
         },
         "networkInterfaceName": {
             "type": "string"
