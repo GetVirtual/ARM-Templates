@@ -30,58 +30,22 @@
   },
   "resources": [
     {
-      "name": "site1vnet",
-      "type": "Microsoft.Network/virtualNetworks",
-      "location": "[parameters('site1location')]",
-      "apiVersion": "2018-10-01",
-      "dependsOn": [ ],
-      "tags": {
-        "displayName": "site1vnet"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('site1vnetPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('site1vnetSubnet1Name')]",
-            "properties": {
-              "addressPrefix": "[variables('site1vnetSubnet1Prefix')]"
-            }
-          }
-        ]
-      }
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2018-05-01",
+      "location": "West Europe",
+      "name": "RG1",
+      "properties": {}
     },
     {
-      "name": "site2vnet",
-      "type": "Microsoft.Network/virtualNetworks",
-      "location": "[parameters('site2location')]",
-      "apiVersion": "2018-10-01",
-      "dependsOn": [],
-      "tags": {
-        "displayName": "site2vnet"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('site2vnetPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('site2vnetSubnet1Name')]",
-            "properties": {
-              "addressPrefix": "[variables('site2vnetSubnet1Prefix')]"
-            }
-          }
-        ]
-      }
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2018-05-01",
+      "location": "North Europe",
+      "name": "RG2",
+      "properties": {}
     }
-    
-    
-    
+
+
+
 
   ]
 }
