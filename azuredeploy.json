@@ -15,7 +15,7 @@
       "allowedValues": [ "North Europe", "West Europe" ],
       "defaultValue": "West Europe",
       "metadata": {
-        "description": "Location for the first site"
+        "description": "Location for the second site"
       }
     }
 
@@ -25,10 +25,10 @@
     "Site2-RGName": "MultiRegion-Site2",
     "Site3-RGName": "MultiRegion-TM",
     "VNET-NEPrefix": "10.10.12.0/24",
-    "VNET-NESubnet1Name": "Subnet-1",
+    "VNET-NESubnet1Name": "default",
     "VNET-NESubnet1Prefix": "10.10.12.0/24",
     "VNET-WEPrefix": "10.10.11.0/24",
-    "VNET-WESubnet1Name": "Subnet-1",
+    "VNET-WESubnet1Name": "default",
     "VNET-WESubnet1Prefix": "10.10.11.0/24"
   },
   "resources": [
@@ -49,7 +49,8 @@
     {
       "name": "VNET-WE",
       "type": "Microsoft.Network/virtualNetworks",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('locationsite1')]",
+      "resourceGroup": "[variables('Site1-RGName')]",
       "apiVersion": "2018-10-01",
       "dependsOn": [],
       "tags": {
@@ -74,7 +75,8 @@
     {
       "name": "VNET-NE",
       "type": "Microsoft.Network/virtualNetworks",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('locationsite2')]",
+      "resourceGroup": "[variables('Site2-RGName')]",
       "apiVersion": "2018-10-01",
       "dependsOn": [],
       "tags": {
