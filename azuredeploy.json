@@ -17,87 +17,198 @@
       "metadata": {
         "description": "Location for the second site"
       }
+    },
+    "SITE1-VM1Name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "SITE1-VM1AdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "SITE1-VM1AdminPassword": {
+      "type": "securestring"
+    },
+    "SITE1-VM1WindowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2019-Datacenter",
+      "allowedValues": [
+        "2019-Datacenter",
+        "2016-Datacenter"
+      ]
     }
 
   },
   "variables": {
-    "Site1-RGName": "MultiRegion-Site1",
-    "Site2-RGName": "MultiRegion-Site2",
-    "Site3-RGName": "MultiRegion-TM",
-    "VNET-NEPrefix": "10.10.12.0/24",
-    "VNET-NESubnet1Name": "default",
-    "VNET-NESubnet1Prefix": "10.10.12.0/24",
-    "VNET-WEPrefix": "10.10.11.0/24",
-    "VNET-WESubnet1Name": "default",
-    "VNET-WESubnet1Prefix": "10.10.11.0/24"
+    "SITE1-VNETPrefix": "10.10.11.0/24",
+    "SITE1-VNETSubnet1Name": "Subnet-1",
+    "SITE1-VNETSubnet1Prefix": "10.10.11.0/24",
+    "SITE2-VNETPrefix": "10.10.12.0/24",
+    "SITE2-VNETSubnet1Name": "Subnet-1",
+    "SITE2-VNETSubnet1Prefix": "10.10.12.0/24",
+    "site1saName": "[concat('site1sa', uniqueString(resourceGroup().id))]",
+    "site2saName": "[concat('site2sa', uniqueString(resourceGroup().id))]",
+    "SITE1-VM1ImagePublisher": "MicrosoftWindowsServer",
+    "SITE1-VM1ImageOffer": "WindowsServer",
+    "SITE1-VM1OSDiskName": "SITE1-VM1OSDisk",
+    "SITE1-VM1VmSize": "Standard_D2_v2",
+    "SITE1-VM1VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'SITE1-VNET')]",
+    "SITE1-VM1SubnetRef": "[concat(variables('SITE1-VM1VnetID'), '/subnets/', variables('SITE1-VNETSubnet1Name'))]",
+    "SITE1-VM1StorageAccountContainerName": "vhds",
+    "SITE1-VM1NicName": "[concat(parameters('SITE1-VM1Name'), 'NetworkInterface')]"
   },
   "resources": [
     {
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2018-05-01",
-      "location": "[parameters('locationsite1')]",
-      "name": "[variables('Site1-RGName')]",
-      "properties": {}
-    },
-    {
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2018-05-01",
-      "location": "[parameters('locationsite2')]",
-      "name": "[variables('Site2-RGName')]",
-      "properties": {}
-    },
-    {
-      "name": "VNET-WE",
+      "name": "SITE1-VNET",
       "type": "Microsoft.Network/virtualNetworks",
-      "location": "[parameters('locationsite1')]",
-      "resourceGroup": "[variables('Site1-RGName')]",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [],
+      "dependsOn": [ ],
       "tags": {
-        "displayName": "VNET-WE"
+        "displayName": "SITE1-VNET"
       },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('VNET-WEPrefix')]"
+            "[variables('SITE1-VNETPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('VNET-WESubnet1Name')]",
+            "name": "[variables('SITE1-VNETSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('VNET-WESubnet1Prefix')]"
+              "addressPrefix": "[variables('SITE1-VNETSubnet1Prefix')]"
             }
           }
         ]
       }
     },
     {
-      "name": "VNET-NE",
+      "name": "SITE2-VNET",
       "type": "Microsoft.Network/virtualNetworks",
-      "location": "[parameters('locationsite2')]",
-      "resourceGroup": "[variables('Site2-RGName')]",
+      "location": "[resourceGroup().location]",
       "apiVersion": "2018-10-01",
       "dependsOn": [],
       "tags": {
-        "displayName": "VNET-NE"
+        "displayName": "SITE2-VNET"
       },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('VNET-NEPrefix')]"
+            "[variables('SITE2-VNETPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('VNET-NESubnet1Name')]",
+            "name": "[variables('SITE2-VNETSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('VNET-NESubnet1Prefix')]"
+              "addressPrefix": "[variables('SITE2-VNETSubnet1Prefix')]"
             }
           }
         ]
+      }
+    },
+    {
+      "name": "[variables('site1saName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "site1sa"
+      },
+      "kind": "Storage"
+    },
+    {
+      "name": "[variables('site2saName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "dependsOn": [],
+      "tags": {
+        "displayName": "site2sa"
+      },
+      "kind": "Storage"
+    },
+    {
+      "name": "[variables('SITE1-VM1NicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'SITE1-VNET')]"
+      ],
+      "tags": {
+        "displayName": "SITE1-VM1Nic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('SITE1-VM1SubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('SITE1-VM1Name')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('site1saName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('SITE1-VM1NicName'))]"
+      ],
+      "tags": {
+        "displayName": "SITE1-VM1"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('SITE1-VM1VmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('SITE1-VM1Name')]",
+          "adminUsername": "[parameters('SITE1-VM1AdminUsername')]",
+          "adminPassword": "[parameters('SITE1-VM1AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('SITE1-VM1ImagePublisher')]",
+            "offer": "[variables('SITE1-VM1ImageOffer')]",
+            "sku": "[parameters('SITE1-VM1WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "SITE1-VM1OSDisk",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('site1saName')), '2016-01-01').primaryEndpoints.blob, variables('SITE1-VM1StorageAccountContainerName'), '/', variables('SITE1-VM1OSDiskName'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('SITE1-VM1NicName'))]"
+            }
+          ]
+        }
       }
     }
+    
+    
 
   ]
 }
