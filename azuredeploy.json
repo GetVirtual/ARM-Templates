@@ -9,19 +9,19 @@
       }
     },
   "variables": {
-    "VNET-WEPrefix": "10.10.11.0/24",
-    "VNET-WESubnet1Name": "Subnet-1",
-    "VNET-WESubnet1Prefix": "10.10.11.0/24",
     "VNET-NEPrefix": "10.10.12.0/24",
     "VNET-NESubnet1Name": "Subnet-1",
-    "VNET-NESubnet1Prefix": "10.10.12.0/24"
+    "VNET-NESubnet1Prefix": "10.10.12.0/24",
+    "VNET-WEPrefix": "10.10.11.0/24",
+    "VNET-WESubnet1Name": "Subnet-1",
+    "VNET-WESubnet1Prefix": "10.10.11.0/24"
   },
   "resources": [
     {
       "name": "VNET-WE",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
+      "apiVersion": "2018-10-01",
       "dependsOn": [ ],
       "tags": {
         "displayName": "VNET-WE"
@@ -46,8 +46,8 @@
       "name": "VNET-NE",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2016-03-30",
-      "dependsOn": [ ],
+      "apiVersion": "2018-10-01",
+      "dependsOn": [],
       "tags": {
         "displayName": "VNET-NE"
       },
