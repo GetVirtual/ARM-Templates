@@ -1,4 +1,4 @@
-<a href="https://azuredeploy.net/?repository=https://github.com/GetVirtual/ARM-Templates/MultiRegionHA" target="_blank">
+<a href="https://azuredeploy.net/?repository=https://github.com/GetVirtual/ARM-Templates/tree/master/MultiRegionHA" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
@@ -6,6 +6,6 @@
 </br>  
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://github.com/GetVirtual/ARM-Templates/MultiRegionHA" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://github.com/GetVirtual/ARM-Templates/tree/master/MultiRegionHA" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
