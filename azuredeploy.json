@@ -35,14 +35,8 @@
       "location": "West Europe",
       "name": "RG1",
       "properties": {}
-    },
-    {
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2018-05-01",
-      "location": "North Europe",
-      "name": "RG2",
-      "properties": {}
     }
+    
 
 
 
