@@ -2,13 +2,28 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
+    "locationsite1": {
       "type": "string",
       "allowedValues": [ "North Europe", "West Europe" ],
-      "defaultValue":  "North Europe"
+      "defaultValue": "North Europe",
+      "metadata": {
+        "description": "Location for the first site"
       }
     },
+    "locationsite2": {
+      "type": "string",
+      "allowedValues": [ "North Europe", "West Europe" ],
+      "defaultValue": "West Europe",
+      "metadata": {
+        "description": "Location for the first site"
+      }
+    }
+
+  },
   "variables": {
+    "Site1-RGName": "MultiRegion-Site1",
+    "Site2-RGName": "MultiRegion-Site2",
+    "Site3-RGName": "MultiRegion-TM",
     "VNET-NEPrefix": "10.10.12.0/24",
     "VNET-NESubnet1Name": "Subnet-1",
     "VNET-NESubnet1Prefix": "10.10.12.0/24",
@@ -18,11 +33,25 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2018-05-01",
+      "location": "[parameters('locationsite1')]",
+      "name": "[variables('Site1-RGName')]",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2018-05-01",
+      "location": "[parameters('locationsite2')]",
+      "name": "[variables('Site2-RGName')]",
+      "properties": {}
+    },
+    {
       "name": "VNET-WE",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "VNET-WE"
       },
@@ -67,6 +96,6 @@
         ]
       }
     }
-     
+
   ]
 }
