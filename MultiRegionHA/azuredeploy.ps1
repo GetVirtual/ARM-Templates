@@ -5,6 +5,6 @@ New-AzResourceGroup -Name "ARM" -Location "West Europe"
 
 Start-Sleep -Second 5
 
-Test-AzResourceGroupDeployment -ResourceGroupName "ARM" -TemplateFile .\azuredeploy.json -ErrorAction Stop -WarningAction Stop
+#Test-AzResourceGroupDeployment -ResourceGroupName "ARM" -TemplateFile .\azuredeploy.json
 
 New-AzResourceGroupDeployment -Name "Deployment" -ResourceGroupName "ARM" -TemplateFile .\azuredeploy.json -Verbose

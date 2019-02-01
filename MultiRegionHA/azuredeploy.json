@@ -42,7 +42,8 @@
       ]
     },
     "UniqueDNSPrefix": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "jlo"
     }
   },
   "variables": {
@@ -90,8 +91,8 @@
     "loadBalancers_site2alb_name": "site2alb",
     "trafficmanagername": "tmprofile",
     "trafficmanagerdns": "[concat(parameters('UniqueDNSPrefix'), 'tm')]",
-    "DSCurl": "",
-    "DSCfunction": ""
+    "DSCurl": "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/IIS.zip",
+    "DSCfunction": "IIS"
   },
   "resources": [
     {
@@ -252,25 +253,23 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('site1vm1Name'),'/', 'ext')]",
+      "name": "[concat(variables('site1vm1Name'),'/Microsoft.Powershell.DSC')]",
       "apiVersion": "2018-06-01",
       "location": "[parameters('Site1location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm1Name'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm1Name'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.19",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "ModulesUrl": "[variables('DSCurl')]",
-          "ConfigurationFunction": "[variables('DSCfunction')]",
-          "Properties": {
-            "MachineName": "[variables('site1vm1Name')]"
+          "publisher": "Microsoft.Powershell",
+          "type": "DSC",
+          "typeHandlerVersion": "2.76",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+              "configurationArguments": {
+                  "RegistrationUrl" : "[variables('DSCurl')]",
+                  "NodeConfigurationName" : "[variables('DSCfunction')]"
+              }
           }
-        },
-        "protectedSettings": null
       }
     },
     {
@@ -353,25 +352,23 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('site1vm2Name'),'/', 'ext')]",
+      "name": "[concat(variables('site1vm2Name'),'/Microsoft.Powershell.DSC')]",
       "apiVersion": "2018-06-01",
       "location": "[parameters('Site1location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm2Name'))]"
+          "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm2Name'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.19",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "ModulesUrl": "[variables('DSCurl')]",
-          "ConfigurationFunction": "[variables('DSCfunction')]",
-          "Properties": {
-            "MachineName": "[variables('site1vm2Name')]"
+          "publisher": "Microsoft.Powershell",
+          "type": "DSC",
+          "typeHandlerVersion": "2.76",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+              "configurationArguments": {
+                  "RegistrationUrl" : "[variables('DSCurl')]",
+                  "NodeConfigurationName" : "[variables('DSCfunction')]"
+              }
           }
-        },
-        "protectedSettings": null
       }
     },
     {
