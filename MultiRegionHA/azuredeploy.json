@@ -94,7 +94,9 @@
     "site1as1Name": "site1as",
     "site2as1Name": "site2as",
     "publicIPAddresses_site1alb_pip_name": "site1alb-pip",
-    "loadBalancers_site1alb_name": "site1alb"
+    "publicIPAddresses_site2alb_pip_name": "site2alb-pip",
+    "loadBalancers_site1alb_name": "site1alb",
+    "loadBalancers_site2alb_name": "site2alb"
     
   },
   "resources": [
@@ -184,9 +186,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'site1vnet')]",
         "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name'))]"
-        
-        
-
       ],
       "tags": {
         "displayName": "site1vm1Nic"
@@ -343,7 +342,8 @@
       "location": "[parameters('site2location')]",
       "apiVersion": "2018-10-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name'))]"
         
       ],
       "tags": {
@@ -357,7 +357,12 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('site2vm1SubnetRef')]"
-              }
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
+                }
+              ]
             }
           }
         ]
@@ -416,7 +421,8 @@
       "location": "[parameters('site2location')]",
       "apiVersion": "2018-10-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name'))]"
       ],
       "tags": {
         "displayName": "site2vm2Nic"
@@ -429,7 +435,12 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('site2vm2SubnetRef')]"
-              }
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
+                }
+              ]
             }
           }
         ]
@@ -604,7 +615,97 @@
           "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site1alb_pip_name'))]"
           
       ]
-  }
+  },
+  {
+    "type": "Microsoft.Network/publicIPAddresses",
+    "sku": {
+        "name": "Basic",
+        "tier": "Regional"
+    },
+    "name": "[variables('publicIPAddresses_site2alb_pip_name')]",
+    "apiVersion": "2018-10-01",
+    "location": "[parameters('site2location')]",
+    "properties": {
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4,
+        "ipTags": []
+    },
+    "dependsOn": []
+  },
+
+  {
+    "type": "Microsoft.Network/loadBalancers",
+    "sku": {
+        "name": "Basic",
+        "tier": "Regional"
+    },
+    "name": "[variables('loadBalancers_site2alb_name')]",
+    "apiVersion": "2018-10-01",
+    "location": "[parameters('site2location')]",
+    "scale": null,
+    "properties": {
+        "frontendIPConfigurations": [
+            {
+                "name": "LoadBalancerFrontEnd",
+                "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site2alb_pip_name'))]"
+                    }
+                }
+            }
+          
+        ],
+        "backendAddressPools": [
+            {
+                "name": "[concat(variables('loadBalancers_site2alb_name'),'-pool')]"
+            }
+        ],
+        "loadBalancingRules": [
+            {
+                "name": "[concat(variables('loadBalancers_site2alb_name'),'-rule')]",
+                "properties": {
+                    
+                    "frontendIPConfiguration": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
+                    },
+                    "frontendPort": 3389,
+                    "backendPort": 3389,
+                    "enableFloatingIP": false,
+                    "idleTimeoutInMinutes": 4,
+                    "protocol": "Tcp",
+                    "enableTcpReset": false,
+                    "loadDistribution": "Default",
+                    "backendAddressPool": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'),'-pool')]"
+                    },
+                    "probe": {
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/probes/', variables('loadBalancers_site2alb_name'),'-probe')]"
+                    }
+                }
+            }
+        ],
+        "probes": [
+            {
+                "name": "[concat(variables('loadBalancers_site2alb_name'),'-probe')]",
+                "properties": {
+                    "protocol": "Tcp",
+                    "port": 3389,
+                    "intervalInSeconds": 5,
+                    "numberOfProbes": 2
+                }
+            }
+        ],
+        "inboundNatRules": [],
+        "inboundNatPools": []
+
+    },
+    "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site2alb_pip_name'))]"
+        
+    ]
+}
 
   ]
 }
