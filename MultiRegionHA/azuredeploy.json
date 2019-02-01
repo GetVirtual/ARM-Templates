@@ -2,18 +2,24 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "site1location": {
+    "Site1location": {
       "type": "string",
-      "allowedValues": [ "North Europe", "West Europe" ],
-      "defaultValue": "North Europe",
+      "allowedValues": [
+        "North Europe",
+        "West Europe"
+      ],
+      "defaultValue": "West Europe",
       "metadata": {
         "description": "Location for the first site"
       }
     },
-    "site2location": {
+    "Site2location": {
       "type": "string",
-      "allowedValues": [ "North Europe", "West Europe" ],
-      "defaultValue": "West Europe",
+      "allowedValues": [
+        "North Europe",
+        "West Europe"
+      ],
+      "defaultValue": "North Europe",
       "metadata": {
         "description": "Location for the second site"
       }
@@ -35,28 +41,9 @@
         "2019-Datacenter"
       ]
     },
-    "site1vm1Name": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "site1vm1"
-    },
-    "site1vm2Name": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "site1vm2"
-    },
-    "site2vm1Name": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "site2vm1"
-    },
-    "site2vm2Name": {
-      "type": "string",
-      "minLength": 1,
-      "defaultValue": "site2vm2"
+    "UniqueDNSPrefix": {
+      "type": "string"
     }
-
-
   },
   "variables": {
     "site1vnetPrefix": "10.10.11.0/24",
@@ -67,37 +54,44 @@
     "site2vnetSubnet1Prefix": "10.10.12.0/24",
     "site1sa1Name": "[concat('site1sa', uniqueString(resourceGroup().id))]",
     "site2sa1Name": "[concat('site2sa', uniqueString(resourceGroup().id))]",
+    "site1vm1Name": "site1vm1",
+    "site1vm2Name": "site1vm2",
+    "site2vm1Name": "site2vm1",
+    "site2vm2Name": "site2vm2",
     "site1vm1ImagePublisher": "MicrosoftWindowsServer",
     "site1vm1ImageOffer": "WindowsServer",
     "site1vm1VmSize": "Standard_D2_v2",
     "site1vm1VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'site1vnet')]",
     "site1vm1SubnetRef": "[concat(variables('site1vm1VnetID'), '/subnets/', variables('site1vnetSubnet1Name'))]",
-    "site1vm1NicName": "[concat(parameters('site1vm1Name'), 'NetworkInterface')]",
+    "site1vm1NicName": "[concat(variables('site1vm1Name'), 'NetworkInterface')]",
     "site1vm2ImagePublisher": "MicrosoftWindowsServer",
     "site1vm2ImageOffer": "WindowsServer",
     "site1vm2VmSize": "Standard_D2_v2",
     "site1vm2VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'site1vnet')]",
     "site1vm2SubnetRef": "[concat(variables('site1vm2VnetID'), '/subnets/', variables('site1vnetSubnet1Name'))]",
-    "site1vm2NicName": "[concat(parameters('site1vm2Name'), 'NetworkInterface')]",
+    "site1vm2NicName": "[concat(variables('site1vm2Name'), 'NetworkInterface')]",
     "site2vm1ImagePublisher": "MicrosoftWindowsServer",
     "site2vm1ImageOffer": "WindowsServer",
     "site2vm1VmSize": "Standard_D2_v2",
     "site2vm1VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
     "site2vm1SubnetRef": "[concat(variables('site2vm1VnetID'), '/subnets/', variables('site2vnetSubnet1Name'))]",
-    "site2vm1NicName": "[concat(parameters('site2vm1Name'), 'NetworkInterface')]",
+    "site2vm1NicName": "[concat(variables('site2vm1Name'), 'NetworkInterface')]",
     "site2vm2ImagePublisher": "MicrosoftWindowsServer",
     "site2vm2ImageOffer": "WindowsServer",
     "site2vm2VmSize": "Standard_D2_v2",
     "site2vm2VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
     "site2vm2SubnetRef": "[concat(variables('site2vm2VnetID'), '/subnets/', variables('site2vnetSubnet1Name'))]",
-    "site2vm2NicName": "[concat(parameters('site2vm2Name'), 'NetworkInterface')]",
+    "site2vm2NicName": "[concat(variables('site2vm2Name'), 'NetworkInterface')]",
     "site1as1Name": "site1as",
     "site2as1Name": "site2as",
-    "publicIPAddresses_site1alb_pip_name": "site1alb-pip",
-    "publicIPAddresses_site2alb_pip_name": "site2alb-pip",
+    "site1albpip": "site1alb-pip",
+    "site2albpip": "site2alb-pip",
     "loadBalancers_site1alb_name": "site1alb",
-    "loadBalancers_site2alb_name": "site2alb"
-    
+    "loadBalancers_site2alb_name": "site2alb",
+    "trafficmanagername": "tmprofile",
+    "trafficmanagerdns": "[concat(parameters('UniqueDNSPrefix'), 'tm')]",
+    "DSCurl": "",
+    "DSCfunction": ""
   },
   "resources": [
     {
@@ -105,7 +99,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[parameters('site1location')]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "site1vnet"
       },
@@ -130,7 +124,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[parameters('site2location')]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "site2vnet"
       },
@@ -201,7 +195,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'), '-pool')]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'), '-pool')]"
                 }
               ]
             }
@@ -210,7 +204,7 @@
       }
     },
     {
-      "name": "[parameters('site1vm1Name')]",
+      "name": "[variables('site1vm1Name')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[parameters('site1location')]",
       "apiVersion": "2017-03-30",
@@ -230,7 +224,7 @@
           "vmSize": "[variables('site1vm1VmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('site1vm1Name')]",
+          "computerName": "[variables('site1vm1Name')]",
           "adminUsername": "[parameters('AdminUserName')]",
           "adminPassword": "[parameters('AdminPassword')]"
         },
@@ -257,6 +251,29 @@
       }
     },
     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('site1vm1Name'),'/', 'ext')]",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('Site1location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm1Name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.19",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "ModulesUrl": "[variables('DSCurl')]",
+          "ConfigurationFunction": "[variables('DSCfunction')]",
+          "Properties": {
+            "MachineName": "[variables('site1vm1Name')]"
+          }
+        },
+        "protectedSettings": null
+      }
+    },
+    {
       "name": "[variables('site1vm2NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[parameters('site1location')]",
@@ -264,8 +281,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'site1vnet')]",
         "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name'))]"
-        
-        
       ],
       "tags": {
         "displayName": "site1vm2Nic"
@@ -281,7 +296,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'), '-pool')]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'), '-pool')]"
                 }
               ]
             }
@@ -290,7 +305,7 @@
       }
     },
     {
-      "name": "[parameters('site1vm2Name')]",
+      "name": "[variables('site1vm2Name')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[parameters('site1location')]",
       "apiVersion": "2017-03-30",
@@ -310,7 +325,7 @@
           "vmSize": "[variables('site1vm2VmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('site1vm2Name')]",
+          "computerName": "[variables('site1vm2Name')]",
           "adminUsername": "[parameters('AdminUsername')]",
           "adminPassword": "[parameters('AdminPassword')]"
         },
@@ -337,6 +352,29 @@
       }
     },
     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('site1vm2Name'),'/', 'ext')]",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('Site1location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm2Name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.19",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "ModulesUrl": "[variables('DSCurl')]",
+          "ConfigurationFunction": "[variables('DSCfunction')]",
+          "Properties": {
+            "MachineName": "[variables('site1vm2Name')]"
+          }
+        },
+        "protectedSettings": null
+      }
+    },
+    {
       "name": "[variables('site2vm1NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[parameters('site2location')]",
@@ -344,7 +382,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
         "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name'))]"
-        
       ],
       "tags": {
         "displayName": "site2vm1Nic"
@@ -360,7 +397,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
                 }
               ]
             }
@@ -369,7 +406,7 @@
       }
     },
     {
-      "name": "[parameters('site2vm1Name')]",
+      "name": "[variables('site2vm1Name')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[parameters('site2location')]",
       "apiVersion": "2017-03-30",
@@ -389,7 +426,7 @@
           "vmSize": "[variables('site2vm1VmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('site2vm1Name')]",
+          "computerName": "[variables('site2vm1Name')]",
           "adminUsername": "[parameters('AdminUsername')]",
           "adminPassword": "[parameters('AdminPassword')]"
         },
@@ -438,7 +475,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'), '-pool')]"
                 }
               ]
             }
@@ -447,7 +484,7 @@
       }
     },
     {
-      "name": "[parameters('site2vm2Name')]",
+      "name": "[variables('site2vm2Name')]",
       "type": "Microsoft.Compute/virtualMachines",
       "location": "[parameters('site2location')]",
       "apiVersion": "2017-03-30",
@@ -467,7 +504,7 @@
           "vmSize": "[variables('site2vm2VmSize')]"
         },
         "osProfile": {
-          "computerName": "[parameters('site2vm2Name')]",
+          "computerName": "[variables('site2vm2Name')]",
           "adminUsername": "[parameters('AdminUsername')]",
           "adminPassword": "[parameters('AdminPassword')]"
         },
@@ -515,7 +552,7 @@
       "type": "Microsoft.Compute/availabilitySets",
       "location": "[parameters('site2location')]",
       "apiVersion": "2018-06-01",
-      "dependsOn": [ ],
+      "dependsOn": [],
       "tags": {
         "displayName": "site2as1"
       },
@@ -530,183 +567,227 @@
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "sku": {
-          "name": "Basic",
-          "tier": "Regional"
+        "name": "Basic",
+        "tier": "Regional"
       },
-      "name": "[variables('publicIPAddresses_site1alb_pip_name')]",
+      "name": "[variables('site1albpip')]",
       "apiVersion": "2018-10-01",
       "location": "[parameters('site1location')]",
       "properties": {
-          "publicIPAddressVersion": "IPv4",
-          "publicIPAllocationMethod": "Dynamic",
-          "idleTimeoutInMinutes": 4,
-          "ipTags": []
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4,
+        "ipTags": [],
+        "dnsSettings": {
+          "domainNameLabel": "[concat(parameters('UniqueDNSPrefix'), 'site1')]"
+        }
       },
       "dependsOn": []
     },
     {
       "type": "Microsoft.Network/loadBalancers",
       "sku": {
-          "name": "Basic",
-          "tier": "Regional"
+        "name": "Basic",
+        "tier": "Regional"
       },
       "name": "[variables('loadBalancers_site1alb_name')]",
       "apiVersion": "2018-10-01",
       "location": "[parameters('site1location')]",
       "scale": null,
       "properties": {
-          "frontendIPConfigurations": [
-              {
-                  "name": "LoadBalancerFrontEnd",
-                  "properties": {
-                      "privateIPAllocationMethod": "Dynamic",
-                      "publicIPAddress": {
-                          "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site1alb_pip_name'))]"
-                      }
-                  }
-              }
-            
-          ],
-          "backendAddressPools": [
-              {
-                  "name": "[concat(variables('loadBalancers_site1alb_name'),'-pool')]"
-              }
-          ],
-          "loadBalancingRules": [
-              {
-                  "name": "[concat(variables('loadBalancers_site1alb_name'),'-rule')]",
-                  "properties": {
-                      
-                      "frontendIPConfiguration": {
-                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
-                      },
-                      "frontendPort": 3389,
-                      "backendPort": 3389,
-                      "enableFloatingIP": false,
-                      "idleTimeoutInMinutes": 4,
-                      "protocol": "Tcp",
-                      "enableTcpReset": false,
-                      "loadDistribution": "Default",
-                      "backendAddressPool": {
-                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'),'-pool')]"
-                      },
-                      "probe": {
-                          "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/probes/', variables('loadBalancers_site1alb_name'),'-probe')]"
-                      }
-                  }
-              }
-          ],
-          "probes": [
-              {
-                  "name": "[concat(variables('loadBalancers_site1alb_name'),'-probe')]",
-                  "properties": {
-                      "protocol": "Tcp",
-                      "port": 3389,
-                      "intervalInSeconds": 5,
-                      "numberOfProbes": 2
-                  }
-              }
-          ],
-          "inboundNatRules": [],
-          "inboundNatPools": []
-
-      },
-      "dependsOn": [
-          "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site1alb_pip_name'))]"
-          
-      ]
-  },
-  {
-    "type": "Microsoft.Network/publicIPAddresses",
-    "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-    },
-    "name": "[variables('publicIPAddresses_site2alb_pip_name')]",
-    "apiVersion": "2018-10-01",
-    "location": "[parameters('site2location')]",
-    "properties": {
-        "publicIPAddressVersion": "IPv4",
-        "publicIPAllocationMethod": "Dynamic",
-        "idleTimeoutInMinutes": 4,
-        "ipTags": []
-    },
-    "dependsOn": []
-  },
-
-  {
-    "type": "Microsoft.Network/loadBalancers",
-    "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-    },
-    "name": "[variables('loadBalancers_site2alb_name')]",
-    "apiVersion": "2018-10-01",
-    "location": "[parameters('site2location')]",
-    "scale": null,
-    "properties": {
         "frontendIPConfigurations": [
-            {
-                "name": "LoadBalancerFrontEnd",
-                "properties": {
-                    "privateIPAllocationMethod": "Dynamic",
-                    "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site2alb_pip_name'))]"
-                    }
-                }
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site1albpip'))]"
+              }
             }
-          
+          }
         ],
         "backendAddressPools": [
-            {
-                "name": "[concat(variables('loadBalancers_site2alb_name'),'-pool')]"
-            }
+          {
+            "name": "[concat(variables('loadBalancers_site1alb_name'),'-pool')]"
+          }
         ],
         "loadBalancingRules": [
-            {
-                "name": "[concat(variables('loadBalancers_site2alb_name'),'-rule')]",
-                "properties": {
-                    
-                    "frontendIPConfiguration": {
-                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
-                    },
-                    "frontendPort": 3389,
-                    "backendPort": 3389,
-                    "enableFloatingIP": false,
-                    "idleTimeoutInMinutes": 4,
-                    "protocol": "Tcp",
-                    "enableTcpReset": false,
-                    "loadDistribution": "Default",
-                    "backendAddressPool": {
-                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'),'-pool')]"
-                    },
-                    "probe": {
-                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/probes/', variables('loadBalancers_site2alb_name'),'-probe')]"
-                    }
-                }
+          {
+            "name": "[concat(variables('loadBalancers_site1alb_name'),'-rule')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
+              },
+              "frontendPort": 3389,
+              "backendPort": 3389,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 4,
+              "protocol": "Tcp",
+              "enableTcpReset": false,
+              "loadDistribution": "Default",
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/backendAddressPools/', variables('loadBalancers_site1alb_name'),'-pool')]"
+              },
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/probes/', variables('loadBalancers_site1alb_name'),'-probe')]"
+              }
             }
+          }
         ],
         "probes": [
-            {
-                "name": "[concat(variables('loadBalancers_site2alb_name'),'-probe')]",
-                "properties": {
-                    "protocol": "Tcp",
-                    "port": 3389,
-                    "intervalInSeconds": 5,
-                    "numberOfProbes": 2
-                }
+          {
+            "name": "[concat(variables('loadBalancers_site1alb_name'),'-probe')]",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 3389,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
             }
+          }
         ],
         "inboundNatRules": [],
         "inboundNatPools": []
-
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('site1albpip'))]"
+      ]
     },
-    "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddresses_site2alb_pip_name'))]"
-        
-    ]
-}
-
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "sku": {
+        "name": "Basic",
+        "tier": "Regional"
+      },
+      "name": "[variables('site2albpip')]",
+      "apiVersion": "2018-10-01",
+      "location": "[parameters('site2location')]",
+      "properties": {
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4,
+        "ipTags": [],
+        "dnsSettings": {
+          "domainNameLabel": "[concat(parameters('UniqueDNSPrefix'), 'site2')]"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "sku": {
+        "name": "Basic",
+        "tier": "Regional"
+      },
+      "name": "[variables('loadBalancers_site2alb_name')]",
+      "apiVersion": "2018-10-01",
+      "location": "[parameters('site2location')]",
+      "scale": null,
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[concat(variables('loadBalancers_site2alb_name'),'-pool')]"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "[concat(variables('loadBalancers_site2alb_name'),'-rule')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
+              },
+              "frontendPort": 3389,
+              "backendPort": 3389,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 4,
+              "protocol": "Tcp",
+              "enableTcpReset": false,
+              "loadDistribution": "Default",
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/backendAddressPools/', variables('loadBalancers_site2alb_name'),'-pool')]"
+              },
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/probes/', variables('loadBalancers_site2alb_name'),'-probe')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[concat(variables('loadBalancers_site2alb_name'),'-probe')]",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 3389,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ],
+        "inboundNatRules": [],
+        "inboundNatPools": []
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "name": "[variables('trafficmanagername')]",
+      "apiVersion": "2018-04-01",
+      "location": "global",
+      "tags": {},
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Weighted",
+        "dnsConfig": {
+          "relativeName": "[variables('trafficmanagerdns')]",
+          "ttl": 60
+        },
+        "monitorConfig": {
+          "protocol": "TCP",
+          "port": 3389,
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10
+        },
+        "endpoints": [
+          {
+            "name": "TMendpointSite1",
+            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+            "properties": {
+              "endpointStatus": "Enabled",
+              "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site1albpip'))]",
+              "weight": 1,
+              "priority": 1
+            }
+          },
+          {
+            "name": "TMendpointSite2",
+            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+            "properties": {
+              "endpointStatus": "Enabled",
+              "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]",
+              "weight": 2,
+              "priority": 2
+            }
+          }
+        ],
+        "trafficViewEnrollmentStatus": "Disabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('site1albpip'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]"
+      ]
+    }
   ]
 }
-
