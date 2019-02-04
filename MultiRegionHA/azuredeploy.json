@@ -35,7 +35,7 @@
     },
     "WindowsOSVersion": {
       "type": "string",
-      "defaultValue": "2019-Datacenter",
+      "defaultValue": "2016-Datacenter",
       "allowedValues": [
         "2016-Datacenter",
         "2019-Datacenter"
@@ -92,6 +92,7 @@
     "trafficmanagername": "tmprofile",
     "trafficmanagerdns": "[concat(parameters('UniqueDNSPrefix'), 'tm')]",
     "DSCurl": "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/IIS.zip",
+    "DSCfilename": "IIS.ps1",
     "DSCfunction": "IIS"
   },
   "resources": [
@@ -257,19 +258,20 @@
       "apiVersion": "2018-06-01",
       "location": "[parameters('Site1location')]",
       "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm1Name'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm1Name'))]"
       ],
       "properties": {
-          "publisher": "Microsoft.Powershell",
-          "type": "DSC",
-          "typeHandlerVersion": "2.76",
-          "autoUpgradeMinorVersion": true,
-          "settings": {
-              "configurationArguments": {
-                  "RegistrationUrl" : "[variables('DSCurl')]",
-                  "NodeConfigurationName" : "[variables('DSCfunction')]"
-              }
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.76",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('DSCurl')]",
+            "script": "[variables('DSCfilename')]",
+            "function": "[variables('DSCfunction')]"
           }
+        }
       }
     },
     {
@@ -356,19 +358,20 @@
       "apiVersion": "2018-06-01",
       "location": "[parameters('Site1location')]",
       "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm2Name'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site1vm2Name'))]"
       ],
       "properties": {
-          "publisher": "Microsoft.Powershell",
-          "type": "DSC",
-          "typeHandlerVersion": "2.76",
-          "autoUpgradeMinorVersion": true,
-          "settings": {
-              "configurationArguments": {
-                  "RegistrationUrl" : "[variables('DSCurl')]",
-                  "NodeConfigurationName" : "[variables('DSCfunction')]"
-              }
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.76",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('DSCurl')]",
+            "script": "[variables('DSCfilename')]",
+            "function": "[variables('DSCfunction')]"
           }
+        }
       }
     },
     {
@@ -450,6 +453,28 @@
       }
     },
     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('site2vm1Name'),'/Microsoft.Powershell.DSC')]",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('Site2location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site2vm1Name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.76",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('DSCurl')]",
+            "script": "[variables('DSCfilename')]",
+            "function": "[variables('DSCfunction')]"
+          }
+        }
+      }
+    },
+    {
       "name": "[variables('site2vm2NicName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[parameters('site2location')]",
@@ -524,6 +549,28 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('site2vm2NicName'))]"
             }
           ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('site2vm2Name'),'/Microsoft.Powershell.DSC')]",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('Site2location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('site2vm2Name'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.76",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('DSCurl')]",
+            "script": "[variables('DSCfilename')]",
+            "function": "[variables('DSCfunction')]"
+          }
         }
       }
     },
@@ -615,8 +662,8 @@
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site1alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
               },
-              "frontendPort": 3389,
-              "backendPort": 3389,
+              "frontendPort": 80,
+              "backendPort": 80,
               "enableFloatingIP": false,
               "idleTimeoutInMinutes": 4,
               "protocol": "Tcp",
@@ -636,7 +683,7 @@
             "name": "[concat(variables('loadBalancers_site1alb_name'),'-probe')]",
             "properties": {
               "protocol": "Tcp",
-              "port": 3389,
+              "port": 80,
               "intervalInSeconds": 5,
               "numberOfProbes": 2
             }
@@ -703,8 +750,8 @@
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancers_site2alb_name')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
               },
-              "frontendPort": 3389,
-              "backendPort": 3389,
+              "frontendPort": 80,
+              "backendPort": 80,
               "enableFloatingIP": false,
               "idleTimeoutInMinutes": 4,
               "protocol": "Tcp",
@@ -724,7 +771,7 @@
             "name": "[concat(variables('loadBalancers_site2alb_name'),'-probe')]",
             "properties": {
               "protocol": "Tcp",
-              "port": 3389,
+              "port": 80,
               "intervalInSeconds": 5,
               "numberOfProbes": 2
             }
@@ -752,7 +799,7 @@
         },
         "monitorConfig": {
           "protocol": "TCP",
-          "port": 3389,
+          "port": 80,
           "intervalInSeconds": 30,
           "toleratedNumberOfFailures": 3,
           "timeoutInSeconds": 10
