@@ -12,13 +12,5 @@ Configuration IIS {
             Name   = "Web-Server"
         }
 
-        File Index 
-        {
-            DestinationPath = "C:\inetpub\wwwroot"
-            SourcePath = "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/IIS.zip"
-            Force = $true
-            Ensure = "Present"
-        }
-
     }
 }
