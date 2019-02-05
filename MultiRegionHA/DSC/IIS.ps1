@@ -12,15 +12,6 @@ Configuration IIS {
             Name   = "Web-Server"
         }
 
-        Script webrequest {
-            SetScript = {
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                Invoke-WebRequest "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/index.html" -OutFile "C:\inetpub\wwwroot\index2.html"
-            }
-            TestScript = { Test-Path "C:\inetpub\wwwroot\index2.html" }
-            GetScript = { @{ Result = (Get-Content C:\inetpub\wwwroot\index2.html) } }       
-        }
-
         Script generateIndex {
             SetScript = {
                 $hostname = hostname
