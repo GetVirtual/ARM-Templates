@@ -30,12 +30,11 @@
       "defaultValue": "vmadmin"
     },
     "AdminPassword": {
-      "type": "securestring",
-      "defaultValue": "$ecurity#123"
+      "type": "securestring"
     },
     "WindowsOSVersion": {
       "type": "string",
-      "defaultValue": "2016-Datacenter",
+      "defaultValue": "2019-Datacenter",
       "allowedValues": [
         "2016-Datacenter",
         "2019-Datacenter"
