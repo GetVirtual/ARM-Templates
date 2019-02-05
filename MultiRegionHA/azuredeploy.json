@@ -92,7 +92,9 @@
     "trafficmanagerdns": "[concat(parameters('UniqueDNSPrefix'), 'tm')]",
     "DSCurl": "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/IIS.zip",
     "DSCfilename": "IIS.ps1",
-    "DSCfunction": "IIS"
+    "DSCfunction": "IIS",
+    "site1nsgname": "site1nsg",
+    "site2nsgname": "site2nsg"
   },
   "resources": [
     {
@@ -100,7 +102,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[parameters('site1location')]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [],
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('site1nsgname'))]"
+      ],
       "tags": {
         "displayName": "site1vnet"
       },
@@ -114,7 +118,10 @@
           {
             "name": "[variables('site1vnetSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('site1vnetSubnet1Prefix')]"
+              "addressPrefix": "[variables('site1vnetSubnet1Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('site1nsgname'))]"
+              }
             }
           }
         ]
@@ -125,7 +132,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[parameters('site2location')]",
       "apiVersion": "2018-10-01",
-      "dependsOn": [],
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('site2nsgname'))]"
+      ],
       "tags": {
         "displayName": "site2vnet"
       },
@@ -139,7 +148,58 @@
           {
             "name": "[variables('site2vnetSubnet1Name')]",
             "properties": {
-              "addressPrefix": "[variables('site2vnetSubnet1Prefix')]"
+              "addressPrefix": "[variables('site2vnetSubnet1Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('site2nsgname'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('site1nsgname')]",
+      "location": "[parameters('Site1location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "web_rule",
+            "properties": {
+              "description": "Allow WEB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('site2nsgname')]",
+      "location": "[parameters('Site2location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "web_rule",
+            "properties": {
+              "description": "Allow WEB",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
             }
           }
         ]
@@ -832,5 +892,12 @@
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "<TrafficManagerFQDN>" : {
+        "type" : "string",
+        "value": "test"
+    }
+  }
+
 }
