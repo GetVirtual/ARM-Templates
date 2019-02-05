@@ -20,5 +20,14 @@ Configuration IIS {
             TestScript = { Test-Path "C:\inetpub\wwwroot\index.html" }
             GetScript = { @{ Result = (Get-Content C:\inetpub\wwwroot\index.html) } }       
         }
+
+        Script generateIndex {
+            SetScript = {
+                $hostname = hostname
+                write-host ("<html><head><title>" + $hostname + "</title></head><body>" + $hostname + "</body></html>") | Out-File "C:\inetpub\wwwroot\index2.html" -Force
+            }
+            TestScript = { Test-Path "C:\inetpub\wwwroot\index2.html" }
+            GetScript = { @{ Result = (Get-Content C:\inetpub\wwwroot\index2.html) } }       
+        }
     }
 }
