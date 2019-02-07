@@ -629,7 +629,7 @@
       "tags": {},
       "properties": {
         "profileStatus": "Enabled",
-        "trafficRoutingMethod": "Weighted",
+        "trafficRoutingMethod": "Priority",
         "dnsConfig": {
           "relativeName": "[variables('trafficmanagerdns')]",
           "ttl": 60
@@ -648,8 +648,7 @@
             "properties": {
               "endpointStatus": "Enabled",
               "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site1albpip'))]",
-              "weight": 1,
-              "priority": 1
+              "priority": 100
             }
           },
           {
@@ -658,8 +657,7 @@
             "properties": {
               "endpointStatus": "Enabled",
               "targetResourceId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('site2albpip'))]",
-              "weight": 2,
-              "priority": 2
+              "priority": 200
             }
           }
         ],
