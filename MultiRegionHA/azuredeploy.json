@@ -16,7 +16,7 @@
     "Site1vmcount": {
       "type": "int",
       "minValue": 1,
-      "defaultValue": "3"
+      "defaultValue": 3
     },
     "Site2location": {
       "type": "string",
@@ -32,7 +32,7 @@
     "Site2vmcount": {
       "type": "int",
       "minValue": 1,
-      "defaultValue": "3"
+      "defaultValue": 3
     },
     "AdminUserName": {
       "type": "string",
@@ -301,6 +301,114 @@
       "copy": {
         "name": "site1dsccopy",
         "count": "[parameters('Site1vmcount')]"
+      }
+    },
+    {
+      "name": "[concat(variables('site2vmName'), copyIndex(1),'nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('site2location')]",
+      "apiVersion": "2018-10-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', 'site2vnet')]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('site2albname'))]"
+      ],
+      "tags": {
+        "displayName": "[concat(variables('site2vmName'), copyIndex(1),'nic')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('site2SubnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('site2albname')), '/backendAddressPools/', variables('site2albname'), '-pool')]"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "copy": {
+        "name": "site2niccopy",
+        "count": "[parameters('site2vmcount')]"
+      }
+    },
+    {
+      "name": "[concat(variables('site2vmName'), copyIndex(1))]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[parameters('site2location')]",
+      "apiVersion": "2017-03-30",
+      "dependsOn": [
+        "site2niccopy",
+        "[resourceId('Microsoft.Compute/availabilitySets',variables('site2as1Name'))]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('site2as1Name'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[variables('VmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('site2vmName'), copyIndex(1))]",
+          "adminUsername": "[parameters('AdminUserName')]",
+          "adminPassword": "[parameters('AdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('ImagePublisher')]",
+            "offer": "[variables('ImageOffer')]",
+            "sku": "[parameters('WindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(variables('site2vmName'), copyIndex(1),'osdisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('site2vmName'), copyIndex(1),'nic'))]"
+            }
+          ]
+        }
+      },
+      "copy": {
+        "name": "site2vmcopy",
+        "count": "[parameters('site2vmcount')]"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('site2vmName'), copyIndex(1),'/Microsoft.Powershell.DSC')]",
+      "apiVersion": "2018-06-01",
+      "location": "[parameters('site2location')]",
+      "dependsOn": [
+        "site2vmcopy"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.76",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "configuration": {
+            "url": "[variables('DSCurl')]",
+            "script": "[variables('DSCfilename')]",
+            "function": "[variables('DSCfunction')]"
+          }
+        }
+      },
+      "copy": {
+        "name": "site2dsccopy",
+        "count": "[parameters('site2vmcount')]"
       }
     },
     {
