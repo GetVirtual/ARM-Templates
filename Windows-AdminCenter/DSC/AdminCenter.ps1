@@ -3,7 +3,7 @@ configuration WindowsAdminCenter
     param
     (
         [System.String]
-        $WacProductId = '{E8A90F67-4525-4F6D-A9A0-9B157F113046}',
+        $WacProductId = '{4FAE3A2E-4369-490E-97F3-0B3BFF183AB9}',
         
         [System.String]
         $WacDownloadPath = 'https://download.microsoft.com/download/1/0/5/1059800B-F375-451C-B37E-758FFC7C8C8B/WindowsAdminCenter1809.5.msi',
