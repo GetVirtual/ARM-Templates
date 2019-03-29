@@ -9,4 +9,4 @@ Start-Sleep -Second 5
 
 #Test-AzResourceGroupDeployment -ResourceGroupName "ARM" -TemplateFile .\azuredeploy.json
 
-New-AzResourceGroupDeployment -Name "Deployment" -ResourceGroupName $RG -TemplateFile .\azuredeploy.json -Verbose
+New-AzResourceGroupDeployment -Name "Deployment" -ResourceGroupName $RG -TemplateFile .\azuredeploy.json -Verbose -Mode Complete -Confirm:$true

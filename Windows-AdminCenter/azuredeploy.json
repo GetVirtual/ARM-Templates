@@ -8,7 +8,8 @@
             "defaultValue": "vmadmin"
         },
         "AdminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "defaultValue": "$ecurity#123"
         },
         "WindowsOSVersion": {
             "type": "string",
@@ -20,11 +21,13 @@
         },
         "dnsLabel1": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "defaultValue": "jlovm1"
         },
         "dnsLabel2": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "defaultValue": "jlovm2"
         }
     },
     "variables": {
@@ -45,7 +48,7 @@
         "vm1SubnetRef": "[concat(variables('vm1VnetID'), '/subnets/', variables('vnetSubnet1Name'))]",
         "vm1NicName": "[concat(variables('vm1Name'), 'NetworkInterface')]",
         "vm2NicName": "[concat(variables('vm2Name'), 'NetworkInterface')]",
-        "DSCurl": "https://github.com/GetVirtual/ARM-Templates/raw/master/MultiRegionHA/DSC/IIS.zip",
+        "DSCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Windows-AdminCenter/DSC/AdminCenter.zip",
         "DSCfilename": "AdminCenter.ps1",
         "DSCfunction": "WindowsAdminCenter"
     },
@@ -156,7 +159,7 @@
                                 "id": "[variables('vm1SubnetRef')]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vm1pipname'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vm2pipname'))]"
                             }
                         }
                     }
@@ -233,7 +236,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "vm1OSDisk",
+                        "name": "vm2OSDisk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     }
@@ -254,7 +257,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions', 'vm1extscript')]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vm1Name'), '/extensions/Microsoft.CustomScript')]"
             ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
@@ -271,30 +274,6 @@
             },
             "tags": {
                 "displayName": "vm1extdsc"
-            }
-        },
-        {
-            "apiVersion": "2018-06-01",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "vm1extscript",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vm1Name'))]"
-            ],
-            "tags": {
-                "displayName": "vm1extscript"
-            },
-            "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.9",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                },
-                "protectedSettings": {
-                    "commandToExecute": "Install-Module PSDscResources -force"
-
-                }
             }
         },
         {
