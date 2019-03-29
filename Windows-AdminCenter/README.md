@@ -7,6 +7,11 @@
      
 
 
+## WAC DSC Installation Sources
+
+* https://dscottraynsford.wordpress.com/2018/07/06/install-windows-admin-center-wac-using-dsc/
+* https://windowsadmincenterdsc.readthedocs.io/en/latest/WacSetup/
+
 ## TODO
 
 * Add NSG with open Port to WAC
