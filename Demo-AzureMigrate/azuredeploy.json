@@ -23,12 +23,8 @@
             "type": "string",
             "minLength": 1,
             "defaultValue": "jlovm1"
-        },
-        "dnsLabel2": {
-            "type": "string",
-            "minLength": 1,
-            "defaultValue": "jlovm2"
         }
+        
     },
     "variables": {
         "vnetPrefix": "10.10.0.0/16",
@@ -36,21 +32,15 @@
         "vnetSubnet1Prefix": "10.10.1.0/24",
         "vm1Name": "vm1",
         "vm1pipname": "vm1-pip",
-        "vm2Name": "vm2",
-        "vm2pipname": "vm2-pip",
         "vm1ImagePublisher": "MicrosoftWindowsServer",
         "vm1ImageOffer": "WindowsServer",
-        "vm2ImagePublisher": "MicrosoftWindowsServer",
-        "vm2ImageOffer": "WindowsServer",
-        "vm1VmSize": "Standard_D2_v2",
-        "vm2VmSize": "Standard_D2_v2",
+        "vm1VmSize": "Standard_D8_v3",
         "vm1VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
         "vm1SubnetRef": "[concat(variables('vm1VnetID'), '/subnets/', variables('vnetSubnet1Name'))]",
         "vm1NicName": "[concat(variables('vm1Name'), 'NetworkInterface')]",
-        "vm2NicName": "[concat(variables('vm2Name'), 'NetworkInterface')]",
-        "DSCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Windows-AdminCenter/DSC/AdminCenter.zip",
-        "DSCfilename": "AdminCenter.ps1",
-        "DSCfunction": "WindowsAdminCenter"
+        "DSCurl": "https://github.com/GetVirtual/Terraform-Templates/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
+        "DSCfilename": "HyperV.ps1",
+        "DSCfunction": "HyperV"
     },
     "resources": [
         {
@@ -93,21 +83,7 @@
                 "displayName": "vm1pip"
             }
         },
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('vm2pipname')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabel2')]"
-                }
-            },
-            "tags": {
-                "displayName": "vm2pip"
-            }
-        },
+        
         {
             "name": "[variables('vm1NicName')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -137,35 +113,7 @@
                 ]
             }
         },
-        {
-            "name": "[variables('vm2NicName')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2018-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('vm2pipname'))]"
-            ],
-            "tags": {
-                "displayName": "vm2Nic"
-            },
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[variables('vm1SubnetRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vm2pipname'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
+        
         {
             "name": "[variables('vm1Name')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -208,48 +156,7 @@
                 }
             }
         },
-        {
-            "name": "[variables('vm2Name')]",
-            "type": "Microsoft.Compute/virtualMachines",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2017-03-30",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('vm2NicName'))]"
-            ],
-            "tags": {
-                "displayName": "vm2"
-            },
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[variables('vm2VmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[variables('vm2Name')]",
-                    "adminUsername": "[parameters('AdminUserName')]",
-                    "adminPassword": "[parameters('AdminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('vm2ImagePublisher')]",
-                        "offer": "[variables('vm2ImageOffer')]",
-                        "sku": "[parameters('WindowsOSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "name": "vm2OSDisk",
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vm2NicName'))]"
-                        }
-                    ]
-                }
-            }
-        },
+        
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vm1Name'), '/Microsoft.Powershell.DSC')]",
@@ -275,32 +182,8 @@
             "tags": {
                 "displayName": "vm1extdsc"
             }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vm2Name'), '/Microsoft.Powershell.DSC')]",
-            "apiVersion": "2018-06-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vm2Name'))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.76",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "configuration": {
-                        "url": "[variables('DSCurl')]",
-                        "script": "[variables('DSCfilename')]",
-                        "function": "[variables('DSCfunction')]"
-                    }
-                }
-            },
-            "tags": {
-                "displayName": "vm2extdsc"
-            }
         }
+        
     ],
     "outputs": {
     }
