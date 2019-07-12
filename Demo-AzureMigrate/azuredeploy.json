@@ -151,34 +151,9 @@
                     ]
                 }
             }
-        },
-        
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vm1Name'), '/Microsoft.Powershell.DSC')]",
-            "apiVersion": "2018-06-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]"
-                
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.76",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "configuration": {
-                        "url": "[variables('DSCurl')]",
-                        "script": "[variables('DSCfilename')]",
-                        "function": "[variables('DSCfunction')]"
-                    }
-                }
-            },
-            "tags": {
-                "displayName": "vm1extdsc"
-            }
         }
+        
+        
         
     ],
     "outputs": {
