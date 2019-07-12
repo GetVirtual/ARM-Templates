@@ -2,11 +2,14 @@ Configuration HyperV {
 
     Import-DscResource -ModuleName 'xHyper-V'
     Import-DscResource -ModuleName 'PSDscResources'
-    Import-DscResource -ModuleName 'xPendingReboot'
 
     Node 'localhost' {
 
-        
+        LocalConfigurationManager
+        {
+            RebootNodeIfNeeded = $true
+        }
+
         MsiPackage InstallWindowsAdminCenter
         {
             ProductId = '{4FAE3A2E-4369-490E-97F3-0B3BFF183AB9}'
@@ -19,6 +22,7 @@ Configuration HyperV {
             Ensure = "Present"
             Name   = "Hyper-V"
             IncludeAllSubFeature = $true
+
         }
 
         WindowsFeature Failover-Clustering {
@@ -50,18 +54,12 @@ Configuration HyperV {
             IncludeAllSubFeature = $true
         }
         
-        xPendingReboot AfterHyperVInstall
-        {
-            Name        = "AfterHyperVInstall"
-            DependsOn   = '[WindowsFeature]Hyper-V', '[WindowsFeature]Hyper-V-Powershell', '[WindowsFeature]Failover-Clustering', '[MsiPackage]InstallWindowsAdminCenter'
-        }
-
         xVMSwitch InternalSwitch
         {
             Ensure          = 'Present'
             Name            = 'NatSwitch'
             Type            = 'Internal'
-            DependsOn       = '[xPendingReboot]AfterHyperVInstall'
+            DependsOn       = '[WindowsFeature]Hyper-V-Powershell', '[WindowsFeature]Hyper-V'
         }
 
     }
