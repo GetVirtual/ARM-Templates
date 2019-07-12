@@ -1,8 +1,8 @@
 Configuration HyperV {
 
-    #Import-DscResource -ModuleName 'PsDesiredStateConfiguration'
     Import-DscResource -ModuleName 'xHyper-V'
     Import-DscResource -ModuleName 'PSDscResources'
+    Import-DscResource -ModuleName 'xPendingReboot'
 
     Node 'localhost' {
 
@@ -32,11 +32,36 @@ Configuration HyperV {
             IncludeAllSubFeature = $true
         }
 
+        WindowsFeature Multipath-IO {
+            Ensure = "Present"
+            Name   = "Multipath-IO "
+            IncludeAllSubFeature = $true
+        }
+
+        WindowsFeature RSAT-Shielded-VM-Tools {
+            Ensure = "Present"
+            Name   = "RSAT-Shielded-VM-Tools"
+            IncludeAllSubFeature = $true
+        }
+        
+        WindowsFeature RSAT-Clustering-Powershell {
+            Ensure = "Present"
+            Name   = "RSAT-Clustering-Powershell"
+            IncludeAllSubFeature = $true
+        }
+        
+        xPendingReboot AfterHyperVInstall
+        {
+            Name        = "AfterHyperVInstall"
+            DependsOn   = '[WindowsFeature]Hyper-V', '[WindowsFeature]Hyper-V-Powershell', '[WindowsFeature]Failover-Clustering', '[MsiPackage]InstallWindowsAdminCenter'
+        }
+
         xVMSwitch InternalSwitch
         {
-            Ensure         = 'Present'
-            Name           = 'NatSwitch'
-            Type           = 'Internal'
+            Ensure          = 'Present'
+            Name            = 'NatSwitch'
+            Type            = 'Internal'
+            DependsOn       = '[xPendingReboot]AfterHyperVInstall'
         }
 
     }
