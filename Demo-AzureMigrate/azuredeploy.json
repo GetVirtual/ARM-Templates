@@ -35,7 +35,7 @@
         "vm1VnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
         "vm1SubnetRef": "[concat(variables('vm1VnetID'), '/subnets/', variables('vnetSubnet1Name'))]",
         "vm1NicName": "[concat(variables('vm1Name'), 'NetworkInterface')]",
-        "DSCurl": "https://github.com/GetVirtual/Terraform-Templates/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
+        "DSCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
         "DSCfilename": "HyperV.ps1",
         "DSCfunction": "HyperV"
     },
