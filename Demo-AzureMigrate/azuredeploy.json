@@ -13,16 +13,12 @@
         },
         "WindowsOSVersion": {
             "type": "string",
-            "defaultValue": "2019-Datacenter",
-            "allowedValues": [
-                "2016-Datacenter",
-                "2019-Datacenter"
-            ]
+            "defaultValue": "2019-Datacenter"
         },
         "dnsLabel1": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "jlovm1"
+            "defaultValue": "onpremjlo"
         }
         
     },
@@ -30,8 +26,8 @@
         "vnetPrefix": "10.10.0.0/16",
         "vnetSubnet1Name": "subnet1",
         "vnetSubnet1Prefix": "10.10.1.0/24",
-        "vm1Name": "vm1",
-        "vm1pipname": "vm1-pip",
+        "vm1Name": "onprem",
+        "vm1pipname": "onprem-pip",
         "vm1ImagePublisher": "MicrosoftWindowsServer",
         "vm1ImageOffer": "WindowsServer",
         "vm1VmSize": "Standard_D8_v3",
