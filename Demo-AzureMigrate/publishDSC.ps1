@@ -1,0 +1,1 @@
+Publish-AzVMDscConfiguration DSC\HyperV.ps1 -OutputArchivePath "DSC\HyperV.zip" -Force
