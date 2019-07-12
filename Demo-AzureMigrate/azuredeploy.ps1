@@ -1,4 +1,4 @@
-$RG = "AdminCenter"
+$RG = "HyperV"
 
 Get-AzSubscription -SubscriptionName "Microsoft Azure Internal Consumption" -ErrorAction SilentlyContinue | Set-AzContext
 
