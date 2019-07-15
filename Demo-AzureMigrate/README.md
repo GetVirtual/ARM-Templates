@@ -22,10 +22,11 @@ deployment is complete when both vms are up & running.
 ### What do you have to do?
 * Deploy the ARM template to your subscription (choose a unique DNS name to your liking)
 * Create Azure Migrate Project in Azure with the Microsoft assessment and migration tools selected (cant be done with ARM right now)
-* Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console 
+* Connect to the Hyper-V server & deactivate the Windows firewall (!!!)
+* Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console
 * ...and finish the configuration wizard & connect the appliance to Azure Migrate (see below for network infos and credentials for the Hyper-V)
 
-A great reference is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
+A great reference how to use Azure Migrate from this point on, is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
 Some tips for the deployment:
 1. Adjust the language setting in the Azure Migrate appliance to your regional setting
