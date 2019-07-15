@@ -42,6 +42,4 @@ Tip 3: I´ve received a login prompt on configuring the first few steps of the a
 * Migration VM: 172.16.1.3
 
 
-
-
-
+Special thanks to Sarah Lean for the article about lab deployment in Azure - https://www.techielass.com/lab-deployment-in-azure
