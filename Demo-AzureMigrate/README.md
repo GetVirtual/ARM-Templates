@@ -17,6 +17,7 @@
 * Download and Import for a nested test migration VM (MigrationVM)
 
 The download and import jobs will take some time ...
+deployment is complete when both vms are up & running.
 
 ### What do you have to do?
 * Create Azure Migrate Project in Azure (cant be done with ARM right now)
