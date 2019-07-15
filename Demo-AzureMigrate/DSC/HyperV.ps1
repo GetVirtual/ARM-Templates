@@ -47,12 +47,38 @@ Configuration HyperV {
             IncludeAllSubFeature = $true
         }
         
+        WindowsFeature Hyper-V-Tools {
+            Ensure = "Present"
+            Name   = "Hyper-V-Tools"
+            IncludeAllSubFeature = $true
+        }
+        
         xVMSwitch InternalSwitch
         {
             Ensure          = 'Present'
-            Name            = 'NatSwitch'
+            Name            = 'NATSwitch'
             Type            = 'Internal'
             DependsOn       = '[WindowsFeature]Hyper-V-Powershell', '[WindowsFeature]Hyper-V'
+        }
+
+        Script Configure
+        {
+            GetScript = 
+            {
+                @{Result = "ConfigureHyperV"}
+            }   
+
+            TestScript = 
+            {
+                return $false
+            }   
+
+            SetScript =
+            {
+                $NatSwitch = Get-NetAdapter -Name "vEthernet (NATSwitch)"
+                New-NetIPAddress -IPAddress 172.16.1.1 -PrefixLength 24 -InterfaceIndex $NatSwitch.ifIndex
+                New-NetNat -Name NestedVMNATnetwork -InternalIPInterfaceAddressPrefix 172.16.1.0/24 -Verbose
+            }
         }
 
     }
