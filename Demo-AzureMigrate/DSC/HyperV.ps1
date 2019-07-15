@@ -79,6 +79,8 @@ Configuration HyperV {
                 New-NetIPAddress -IPAddress 172.16.1.1 -PrefixLength 24 -InterfaceIndex $NatSwitch.ifIndex
                 New-NetNat -Name NestedVMNATnetwork -InternalIPInterfaceAddressPrefix 172.16.1.0/24 -Verbose
             }
+
+            DependsOn = '[xVMSwitch]InternalSwitch'
         }
 
     }
