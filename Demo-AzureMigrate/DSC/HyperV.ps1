@@ -75,9 +75,32 @@ Configuration HyperV {
 
             SetScript =
             {
+                # Extend disk
+                Resize-Partition -DiskNumber 0 -PartitionNumber 2 -Size (500GB)
+                
+                # Create NAT Switch und assign IP on the interface
                 $NatSwitch = Get-NetAdapter -Name "vEthernet (NATSwitch)"
                 New-NetIPAddress -IPAddress 172.16.1.1 -PrefixLength 24 -InterfaceIndex $NatSwitch.ifIndex
                 New-NetNat -Name NestedVMNATnetwork -InternalIPInterfaceAddressPrefix 172.16.1.0/24 -Verbose
+                #Add-NetNatStaticMapping -NatName "NATMigrationAppliance" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 172.16.1.2 -InternalPort 44368 -ExternalPort 44368
+               
+                # Download & Start Azure Migrate Appliance
+                Add-Type -assembly "system.io.compression.filesystem"
+                $URL = "https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrateAppliance.zip"
+                $DLFile = "D:\AzureMigrateAppliance.zip"
+                Invoke-WebRequest $URL -OutFile $DLFile
+                [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
+                Import-VM -Path 'C:\VirtualMachines\AzureMigrateAppliance\Virtual Machines\53FF67B5-C68F-4099-BAF7-91FECDD524BD.XML'
+                Start-VM -Name AzureMigrateAppliance
+
+                # Download & Start MigrationVM
+                $URL = "https://downloadlocationonazure.blob.core.windows.net/backuplab/AzureLabVMs.zip"
+                $DLFile = "D:\MigrationVM.zip"
+                Invoke-WebRequest $URL -OutFile $DLFile
+                [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
+                Import-VM -Path 'C:\VirtualMachines\MigrationVM\Virtual Machines\'
+                Start-VM -Name MigrationVM
+
             }
 
             DependsOn = '[xVMSwitch]InternalSwitch'
