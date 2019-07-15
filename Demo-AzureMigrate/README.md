@@ -20,6 +20,7 @@ The download and import jobs will take some time (about 45 minutes)...
 deployment is complete when both vms are up & running.
 
 ### What do you have to do?
+* Deploy the ARM template to your subscription (choose a unique DNS name to your liking)
 * Create Azure Migrate Project in Azure (cant be done with ARM right now)
 * Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console 
 * ...and finish the configuration wizard & connect the appliance to Azure Migrate (see below for network infos and credentials for the Hyper-V)
