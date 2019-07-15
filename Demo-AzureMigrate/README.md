@@ -17,20 +17,20 @@
 * Download and Import for a nested test migration VM (MigrationVM)
 
 The download and import jobs will take some time (about 45 minutes)...
-deployment is complete when both vms are up & running.
+deployment is complete when both nested vms are up & running.
 
 ### What do you have to do?
 * Deploy the ARM template to your subscription (choose a unique DNS name to your liking)
-* Create Azure Migrate Project in Azure with the Microsoft assessment and migration tools selected (cant be done with ARM right now)
-* Connect to the Hyper-V server & deactivate the Windows firewall (!!!)
+* Create a Azure Migrate Project within the Azure Portal with the Microsoft assessment and migration tools selected (can´t be done with ARM right now)
+* Connect to the Hyper-V server & deactivate the Windows firewall
 * Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console
 * ...and finish the configuration wizard & connect the appliance to Azure Migrate (see below for network infos and credentials for the Hyper-V)
 
 A great reference how to use Azure Migrate from this point on, is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
 Some tips for the deployment:
-1. Adjust the language setting in the Azure Migrate appliance to your regional setting
-2. Deactivate the firewall on the Hyper-V host if there are any connection problems.
+1. Adjust the language setting in the Azure Migrate appliance to your regional settings
+2. Deactivate the firewall on the Hyper-V host
 3. I´ve received a login prompt on configuring the first few steps of the appliance, simply click it away ...
 
 ### Credentials
