@@ -82,8 +82,10 @@ Configuration HyperV {
                 $NatSwitch = Get-NetAdapter -Name "vEthernet (NATSwitch)"
                 New-NetIPAddress -IPAddress 172.16.1.1 -PrefixLength 24 -InterfaceIndex $NatSwitch.ifIndex
                 New-NetNat -Name NestedVMNATnetwork -InternalIPInterfaceAddressPrefix 172.16.1.0/24 -Verbose
-                #Add-NetNatStaticMapping -NatName "NATMigrationAppliance" -Protocol TCP -ExternalIPAddress 0.0.0.0 -InternalIPAddress 172.16.1.2 -InternalPort 44368 -ExternalPort 44368
-               
+                
+                # Disable Windows Firewall
+                Set-NetFirewallProfile -All -Enabled False -Verbose
+
                 # Download & Start Azure Migrate Appliance
                 Add-Type -assembly "system.io.compression.filesystem"
                 $URL = "https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrateAppliance.zip"

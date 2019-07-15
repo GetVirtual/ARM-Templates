@@ -16,13 +16,13 @@
 * Download and Import for the nested Azure Migrate Appliance VM
 * Download and Import for a nested test migration VM (MigrationVM)
 
-The download and import jobs will take some time ...
+The download and import jobs will take some time (about 45 minutes)...
 deployment is complete when both vms are up & running.
 
 ### What do you have to do?
 * Create Azure Migrate Project in Azure (cant be done with ARM right now)
 * Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console 
-* ...and finish the configuration wizard & connect the appliance to Azure Migrate
+* ...and finish the configuration wizard & connect the appliance to Azure Migrate (see below for network infos and credentials for the Hyper-V)
 
 A great reference is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
