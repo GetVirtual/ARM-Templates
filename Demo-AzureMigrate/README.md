@@ -5,6 +5,8 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+---
+
 ![azuremigrate](https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrate.jpg "Azure Migrate")
 
 ### ARM Template provides
