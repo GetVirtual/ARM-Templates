@@ -98,7 +98,7 @@ Configuration HyperV {
                 $DLFile = "D:\MigrationVM.zip"
                 Invoke-WebRequest $URL -OutFile $DLFile
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
-                Import-VM -Path 'C:\VirtualMachines\MigrationVM\Virtual Machines\'
+                Import-VM -Path 'C:\VirtualMachines\MigrationVM\Virtual Machines\C50E94CD-0B7E-41AE-957C-3A3846E28751.vmcx'
                 Start-VM -Name MigrationVM
 
             }

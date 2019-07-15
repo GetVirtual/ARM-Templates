@@ -16,6 +16,8 @@
 * Download and Import for the nested Azure Migrate Appliance VM
 * Download and Import for a nested test migration VM (MigrationVM)
 
+The download and import jobs will take some time ...
+
 ### What do you have to do?
 * Create Azure Migrate Project in Azure (cant be done with ARM right now)
 * Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console 
@@ -33,7 +35,6 @@ A great reference is the blog post from Thomas Maurer: https://www.thomasmaurer.
 * Azure Migrate Appliance: 172.16.1.2
 * Migration VM: 172.16.1.3
 
-### How to 
 
 
 
