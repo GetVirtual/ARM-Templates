@@ -5,7 +5,7 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-!(https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrate.jpg)
+![azuremigrate](https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrate.jpg "Azure Migrate")
 
 ### ARM Template provides
 * Azure Virtual Machine with Hyper-V installed and configured
