@@ -24,7 +24,11 @@ deployment is complete when both nested vms are up & running.
 * Create a Azure Migrate Project within the Azure Portal with the Microsoft assessment and migration tools selected (can´t be done with ARM right now)
 * Connect to the Hyper-V server & deactivate the Windows firewall
 * Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console
-* ...and finish the configuration wizard & connect the appliance to Azure Migrate (see below for network infos and credentials for the Hyper-V)
+* ... open the Migration Appliance configuration web page
+* ... let the appliance perform its checks and updates
+* ... log in to your Azure account
+* ... connect to your Azure Migrate project
+* ... add the credentials and network infos for your Hyper-V (see below)
 
 A great reference how to use Azure Migrate from this point on, is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
