@@ -18,7 +18,7 @@
         "dnsLabel1": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "[uniqueString(resourceGroup().id)]"
+            "defaultValue": "onpremjlo"
         }
         
     },
