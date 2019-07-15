@@ -7,6 +7,8 @@
 
 ---
 
+## Azure Migrate Demo Environment - ARM Template
+
 ![azuremigrate](https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrate.jpg "Azure Migrate")
 
 ### ARM Template provides
