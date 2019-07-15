@@ -27,9 +27,10 @@ deployment is complete when both vms are up & running.
 
 A great reference is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
-Tip 1: Adjust the language setting in the Azure Migrate appliance to your regional setting
-Tip 2: Deactivate the firewall on the Hyper-V host if there are any connection problems.
-Tip 3: I´ve received a login prompt on configuring the first few steps of the appliance, simply click it away ...
+Some tips for the deployment:
+1. Adjust the language setting in the Azure Migrate appliance to your regional setting
+2. Deactivate the firewall on the Hyper-V host if there are any connection problems.
+3. I´ve received a login prompt on configuring the first few steps of the appliance, simply click it away ...
 
 ### Credentials
 * Hyper-V Host: for you to choose with the ARM template deployment (default: vmadmin // $ecurity#123)
