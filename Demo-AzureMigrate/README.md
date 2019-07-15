@@ -30,7 +30,7 @@ deployment is complete when both nested vms are up & running.
 * ... connect to your Azure Migrate project
 * ... add the credentials and network infos for your Hyper-V (see below)
 
-A great reference how to use Azure Migrate from this point on, is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
+A great reference on how to use Azure Migrate from this point on, is the blog post from Thomas Maurer: https://www.thomasmaurer.ch/2019/07/assess-and-migrate-hyper-v-vms-with-azure-migrate/
 
 Some tips for the deployment:
 1. Adjust the language setting in the Azure Migrate appliance to your regional settings
