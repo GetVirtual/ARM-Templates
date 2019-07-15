@@ -94,7 +94,7 @@ Configuration HyperV {
                 Start-VM -Name AzureMigrateAppliance
 
                 # Download & Start MigrationVM
-                $URL = "https://downloadlocationonazure.blob.core.windows.net/backuplab/AzureLabVMs.zip"
+                $URL = "https://azuremigratedemo.blob.core.windows.net/vms/MigrationVM.zip"
                 $DLFile = "D:\MigrationVM.zip"
                 Invoke-WebRequest $URL -OutFile $DLFile
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
