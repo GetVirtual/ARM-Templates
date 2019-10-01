@@ -45,7 +45,7 @@ A great reference on how to use Azure Migrate from this point on, is the blog po
 
 ### Hyper-V NAT Network Details
 * Hyper-V Host: 172.16.1.1
-* Azure Migrate Appliance: 172.16.1.2
+* Azure Migrate Appliance: 172.16.1.2, Azure Migrate Appliance https://172.16.1.2:44368
 * Migration VM: 172.16.1.3
 
 
