@@ -25,9 +25,8 @@ The download and import jobs will take some time (about 45 minutes)... the deplo
     * Choose the Microsoft migration tools
 3. Connect to the Hyper-V server & deactivate the Windows firewall
 4. Connect to the Azure Migrate Appliance from the Hyper-V Host via RDP or Hyper-V console
-    * https://appliancename-or-IPAddress:44368
     * Tip: Adjust the language setting in the Azure Migrate appliance to your regional settings
-    * Open the Migration Appliance configuration web page
+    * Open the Migration Appliance configuration web page (Link on desktop)
     * Click through the appliance connectivity and update checks. If you receive a prompt for credentials at this stage, simply close it.
     * After the successful update scroll to the top and acknowledge the restart prompt. Again click through the appliance connectivity and update checks.
     * Log in to your Azure account
@@ -45,7 +44,7 @@ A great reference on how to use Azure Migrate from this point on, is the blog po
 
 ### Hyper-V NAT Network Details
 * Hyper-V Host: 172.16.1.1
-* Azure Migrate Appliance: 172.16.1.2, Azure Migrate Appliance https://172.16.1.2:44368
+* Azure Migrate Appliance: 172.16.1.2
 * Migration VM: 172.16.1.3
 
 
