@@ -24,18 +24,31 @@
             "type": "string",
             "minLength": 1,
             "defaultValue": "onpremfsarm"
+        },
+        "domainsafemode": {
+            "type": "securestring",
+            "minLength": 1,
+            "defaultValue": "$ecurity#123"
+        },
+        "domainname": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "jrlobenz.rockz"
         }
+
 
     },
     "variables": {
         "vnetPrefix": "10.10.0.0/16",
         "vnetSubnetName": "subnet1",
-        "vnetSubnetPrefix": "10.10.1.0/24",
+        "vnetSubnetPrefix": "10.10.0.0/24",
+
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
 
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
+        "vmDCstaticprivip": "10.10.0.4",
         "vmDCVmSize": "Standard_B4ms",
         "vmDCosdisktype": "Premium_LRS",
         "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -44,6 +57,7 @@
 
         "vmFSName": "OnPrem-FS",
         "vmFSpipname": "OnPrem-FS-pip",
+        "vmFSstaticprivip": "10.10.0.5",
         "vmFSVmSize": "Standard_B4ms",
         "vmFSosdisktype": "Premium_LRS",
         "vmFSVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -69,7 +83,13 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('vnetPrefix')]"
+                        "[variables('vnetPrefix')]",
+                        "168.63.129.16"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "[variables('vmDCstaticprivip')]"
                     ]
                 },
                 "subnets": [
@@ -115,7 +135,8 @@
                     {
                         "name": "ipconfig1",
                         "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAddress": "[variables('vmDCstaticprivip')]",
+                            "privateIPAllocationMethod": "Static",
                             "subnet": {
                                 "id": "[variables('vmDCSubnetRef')]"
                             },
@@ -195,25 +216,27 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
-                        "domainname": "jrlobenz.rockz"
+                        "domainname": "[parameters('domainname')]"
                     }
                 },
                 "protectedSettings": {
                     "configurationArguments": {
                         "domainCred": {
-                            "userName": "vmadmin",
-                            "password": "$ecurity#123"
+                            "userName": "[parameters('AdminUserName')]",
+                            "password": "[parameters('AdminPassword')]"
                         },
                         "safemodeCred": {
                             "userName": "pwdonly",
-                            "password": "$ecurity#123"
+                            "password": "[parameters('domainsafemode')]"
                         }
                     }
-                },
-
-                "tags": {
-                    "displayName": "vmDCextdsc"
                 }
+
+
+            },
+
+            "tags": {
+                "displayName": "vmDCextdsc"
             }
         },
         {
@@ -249,7 +272,8 @@
                     {
                         "name": "ipconfig1",
                         "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAddress": "[variables('vmFSstaticprivip')]",
+                            "privateIPAllocationMethod": "Static",
                             "subnet": {
                                 "id": "[variables('vmFSSubnetRef')]"
                             },
