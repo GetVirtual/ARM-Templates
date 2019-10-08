@@ -5,7 +5,10 @@ Configuration DC {
         [Parameter(Mandatory)]             
         [string]$domainname,             
         [Parameter(Mandatory)]            
-        [string]$safemodeAdministratorCred            
+        [pscredential]$safemodeCred,
+        [Parameter(Mandatory)]            
+        [pscredential]$domainCred
+
     )    
 
     Import-DscResource -ModuleName xActiveDirectory   
@@ -31,9 +34,9 @@ Configuration DC {
         # No slash at end of folder paths            
         xADDomain FirstDS             
         {             
-            DomainName                    = $Node.DomainName             
+            DomainName                    = $domainname             
             DomainAdministratorCredential = $domainCred             
-            SafemodeAdministratorPassword = $safemodeAdministratorCred            
+            SafemodeAdministratorPassword = $safemodeCred          
             DatabasePath                  = 'C:\NTDS'            
             LogPath                       = 'C:\NTDS'            
             DependsOn                     = "[WindowsFeature]ADDSInstall"           

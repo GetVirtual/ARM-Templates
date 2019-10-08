@@ -195,16 +195,25 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
-                        "domainname": "jrlobenz.rockz",
-                        "safemodeAdministratorCred": "securesafemodepwd"
+                        "domainname": "jrlobenz.rockz"
                     }
+                },
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "domainCred": {
+                            "userName": "vmadmin",
+                            "password": "$ecurity#123"
+                        },
+                        "safemodeCred": {
+                            "userName": "pwdonly",
+                            "password": "$ecurity#123"
+                        }
+                    }
+                },
+
+                "tags": {
+                    "displayName": "vmDCextdsc"
                 }
-
-
-            },
-
-            "tags": {
-                "displayName": "vmDCextdsc"
             }
         },
         {
