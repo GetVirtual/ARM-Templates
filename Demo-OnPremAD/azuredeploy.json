@@ -18,14 +18,14 @@
         "dnsLabelDC": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremdc"
+            "defaultValue": "onpremdcarm"
         },
         "dnsLabelFS": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremfs"
+            "defaultValue": "onpremfsarm"
         }
-        
+
     },
     "variables": {
         "vnetPrefix": "10.10.0.0/16",
@@ -33,7 +33,7 @@
         "vnetSubnetPrefix": "10.10.1.0/24",
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
-        
+
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
         "vmDCVmSize": "Standard_B4ms",
@@ -41,7 +41,7 @@
         "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
         "vmDCSubnetRef": "[concat(variables('vmDCVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmDCNicName": "[concat(variables('vmDCName'), 'NetworkInterface')]",
-        
+
         "vmFSName": "OnPrem-FS",
         "vmFSpipname": "OnPrem-FS-pip",
         "vmFSVmSize": "Standard_B4ms",
@@ -49,13 +49,11 @@
         "vmFSVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
         "vmFSSubnetRef": "[concat(variables('vmFSVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmFSNicName": "[concat(variables('vmFSName'), 'NetworkInterface')]",
-        
-        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
-        "DSCDCfilename": "HyperV.ps1",
-        "DSCDCfunction": "HyperV",
-        "DSCFSurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
-        "DSCFSfilename": "HyperV.ps1",
-        "DSCFSfunction": "HyperV"
+
+        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/DC.zip",
+        "DSCDCfilename": "DC.ps1",
+        "DSCDCfunction": "DC"
+
     },
     "resources": [
         {
@@ -63,7 +61,8 @@
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
-            "dependsOn": [],
+            "dependsOn": [
+            ],
             "tags": {
                 "displayName": "vnet"
             },
@@ -98,7 +97,7 @@
                 "displayName": "vmDCpip"
             }
         },
-        
+
         {
             "name": "[variables('vmDCNicName')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -128,7 +127,7 @@
                 ]
             }
         },
-        
+
         {
             "name": "[variables('vmDCName')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -157,7 +156,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "vmDCOSDisk",
+                        "name": "OnPrem-DC-Disk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk": {
@@ -182,7 +181,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
-                
+
             ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
@@ -200,7 +199,9 @@
                     "argument1": "Value1",
                     "argument2": "Value2"
                 }
+
             },
+
             "tags": {
                 "displayName": "vmDCextdsc"
             }
@@ -220,7 +221,7 @@
                 "displayName": "vmFSpip"
             }
         },
-        
+
         {
             "name": "[variables('vmFSNicName')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -250,7 +251,7 @@
                 ]
             }
         },
-        
+
         {
             "name": "[variables('vmFSName')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -279,7 +280,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "vmFSOSDisk",
+                        "name": "OnPrem-FS-Disk",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk": {
@@ -297,10 +298,10 @@
                 }
             }
         }
-        
-        
-        
-        
+
+
+
+
     ],
     "outputs": {
     }
