@@ -3,32 +3,41 @@ Configuration DC {
     param             
     (             
         [Parameter(Mandatory)]             
-        [string]$argument1,             
+        [string]$domainname,             
         [Parameter(Mandatory)]            
-        [string]$argument2            
+        [string]$safemodeAdministratorCred            
     )    
 
+    Import-DscResource -ModuleName xActiveDirectory   
 
     Node 'localhost' {
 
-        LocalConfigurationManager
-        {
+        LocalConfigurationManager {
             RebootNodeIfNeeded = $true
-            ConfigurationMode = 'ApplyOnly'
-            ActionAfterReboot = 'ContinueConfiguration'
+            ConfigurationMode  = 'ApplyOnly'
+            ActionAfterReboot  = 'ContinueConfiguration'
         }
 
-        WindowsFeature ADDSInstall             
-        {             
+        WindowsFeature ADDSInstall {             
             Ensure = "Present"             
-            Name = "AD-Domain-Services"             
+            Name   = "AD-Domain-Services"             
         }            
             
-        WindowsFeature ADDSTools            
-        {             
+        WindowsFeature ADDSTools {             
             Ensure = "Present"             
-            Name = "RSAT-ADDS"             
+            Name   = "RSAT-ADDS"             
         }  
+
+        # No slash at end of folder paths            
+        xADDomain FirstDS             
+        {             
+            DomainName                    = $Node.DomainName             
+            DomainAdministratorCredential = $domainCred             
+            SafemodeAdministratorPassword = $safemodeAdministratorCred            
+            DatabasePath                  = 'C:\NTDS'            
+            LogPath                       = 'C:\NTDS'            
+            DependsOn                     = "[WindowsFeature]ADDSInstall"           
+        } 
 
     
         

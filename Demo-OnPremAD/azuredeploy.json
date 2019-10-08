@@ -195,8 +195,8 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
-                        "argument1": "Value1",
-                        "argument2": "Value2"
+                        "domainname": "jrlobenz.rockz",
+                        "safemodeAdministratorCred": "securesafemodepwd"
                     }
                 }
 
