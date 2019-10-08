@@ -1,5 +1,12 @@
 Configuration DC {
-
+    
+    param             
+    (             
+        [Parameter(Mandatory)]             
+        [string]$argument1,             
+        [Parameter(Mandatory)]            
+        [string]$argument2            
+    )    
 
 
     Node 'localhost' {

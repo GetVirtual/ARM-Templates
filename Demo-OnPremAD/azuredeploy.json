@@ -193,12 +193,13 @@
                         "url": "[variables('DSCDCurl')]",
                         "script": "[variables('DSCDCfilename')]",
                         "function": "[variables('DSCDCfunction')]"
+                    },
+                    "configurationArguments": {
+                        "argument1": "Value1",
+                        "argument2": "Value2"
                     }
-                },
-                "configurationArguments": {
-                    "argument1": "Value1",
-                    "argument2": "Value2"
                 }
+
 
             },
 
