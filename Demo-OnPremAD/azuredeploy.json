@@ -1,0 +1,307 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "AdminUserName": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "vmadmin"
+        },
+        "AdminPassword": {
+            "type": "securestring",
+            "defaultValue": "$ecurity#123"
+        },
+        "WindowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter"
+        },
+        "dnsLabelDC": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "onpremdc"
+        },
+        "dnsLabelFS": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "onpremfs"
+        }
+        
+    },
+    "variables": {
+        "vnetPrefix": "10.10.0.0/16",
+        "vnetSubnetName": "subnet1",
+        "vnetSubnetPrefix": "10.10.1.0/24",
+        "vmImagePublisher": "MicrosoftWindowsServer",
+        "vmImageOffer": "WindowsServer",
+        
+        "vmDCName": "OnPrem-DC",
+        "vmDCpipname": "OnPrem-DC-pip",
+        "vmDCVmSize": "Standard_B4ms",
+        "vmDCosdisktype": "Premium_LRS",
+        "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+        "vmDCSubnetRef": "[concat(variables('vmDCVnetID'), '/subnets/', variables('vnetSubnetName'))]",
+        "vmDCNicName": "[concat(variables('vmDCName'), 'NetworkInterface')]",
+        
+        "vmFSName": "OnPrem-FS",
+        "vmFSpipname": "OnPrem-FS-pip",
+        "vmFSVmSize": "Standard_B4ms",
+        "vmFSosdisktype": "Premium_LRS",
+        "vmFSVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+        "vmFSSubnetRef": "[concat(variables('vmFSVnetID'), '/subnets/', variables('vnetSubnetName'))]",
+        "vmFSNicName": "[concat(variables('vmFSName'), 'NetworkInterface')]",
+        
+        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
+        "DSCDCfilename": "HyperV.ps1",
+        "DSCDCfunction": "HyperV",
+        "DSCFSurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
+        "DSCFSfilename": "HyperV.ps1",
+        "DSCFSfunction": "HyperV"
+    },
+    "resources": [
+        {
+            "name": "vnet",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-10-01",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "vnet"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vnetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vnetSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnetSubnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('vmDCpipname')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelDC')]"
+                }
+            },
+            "tags": {
+                "displayName": "vmDCpip"
+            }
+        },
+        
+        {
+            "name": "[variables('vmDCNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmDCpipname'))]"
+            ],
+            "tags": {
+                "displayName": "vmDCNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('vmDCSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmDCpipname'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        
+        {
+            "name": "[variables('vmDCName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDCNicName'))]"
+            ],
+            "tags": {
+                "displayName": "vmDC"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmDCVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmDCName')]",
+                    "adminUsername": "[parameters('AdminUserName')]",
+                    "adminPassword": "[parameters('AdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('vmImagePublisher')]",
+                        "offer": "[variables('vmImageOffer')]",
+                        "sku": "[parameters('WindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "vmDCOSDisk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('vmDCosdisktype')]"
+                        },
+                        "diskSizeGB": 512
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDCNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmDCName'), '/Microsoft.Powershell.DSC')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
+                
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.76",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "configuration": {
+                        "url": "[variables('DSCDCurl')]",
+                        "script": "[variables('DSCDCfilename')]",
+                        "function": "[variables('DSCDCfunction')]"
+                    }
+                },
+                "configurationArguments": {
+                    "argument1": "Value1",
+                    "argument2": "Value2"
+                }
+            },
+            "tags": {
+                "displayName": "vmDCextdsc"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('vmFSpipname')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelFS')]"
+                }
+            },
+            "tags": {
+                "displayName": "vmFSpip"
+            }
+        },
+        
+        {
+            "name": "[variables('vmFSNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmFSpipname'))]"
+            ],
+            "tags": {
+                "displayName": "vmFSNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('vmFSSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmFSpipname'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        
+        {
+            "name": "[variables('vmFSName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]"
+            ],
+            "tags": {
+                "displayName": "vmFS"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmFSVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmFSName')]",
+                    "adminUsername": "[parameters('AdminUserName')]",
+                    "adminPassword": "[parameters('AdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('vmImagePublisher')]",
+                        "offer": "[variables('vmImageOffer')]",
+                        "sku": "[parameters('WindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "vmFSOSDisk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('vmFSosdisktype')]"
+                        },
+                        "diskSizeGB": 512
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]"
+                        }
+                    ]
+                }
+            }
+        }
+        
+        
+        
+        
+    ],
+    "outputs": {
+    }
+}
