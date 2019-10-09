@@ -66,7 +66,11 @@
 
         "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/DC.zip",
         "DSCDCfilename": "DC.ps1",
-        "DSCDCfunction": "DC"
+        "DSCDCfunction": "DC",
+
+        "DSCFSurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/FS.zip",
+        "DSCFSfilename": "FS.ps1",
+        "DSCFSfunction": "FS"
 
     },
     "resources": [
@@ -330,6 +334,48 @@
                         }
                     ]
                 }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmFSName'), '/Microsoft.Powershell.DSC')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmFSName'))]"
+
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.76",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "configuration": {
+                        "url": "[variables('DSCFSurl')]",
+                        "script": "[variables('DSCFSfilename')]",
+                        "function": "[variables('DSCFSfunction')]"
+                    },
+                    "configurationArguments": {
+                        "domainname": "[parameters('domainname')]",
+                        "machinename": "[variables('vmFSName')]"
+                    }
+                },
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "domainCred": {
+                            "userName": "[parameters('AdminUserName')]",
+                            "password": "[parameters('AdminPassword')]"
+                        },
+                        "safemodeCred": {
+                            "userName": "pwdonly",
+                            "password": "[parameters('domainsafemode')]"
+                        }
+                    }
+                }
+            },
+            "tags": {
+                "displayName": "vmFSextdsc"
             }
         }
 

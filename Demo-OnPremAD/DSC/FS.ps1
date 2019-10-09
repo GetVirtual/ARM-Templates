@@ -1,22 +1,38 @@
 Configuration FS {
 
-    Import-DscResource -ModuleName 'xHyper-V'
-    Import-DscResource -ModuleName 'PSDscResources'
+    [Parameter(Mandatory)]             
+    [string]$domainname,             
+    [Parameter(Mandatory)]            
+    [pscredential]$domainCred,
+    [Parameter(Mandatory)]
+    [string]$machinename
+
+    Import-DscResource -ModuleName xActiveDirectory   
+    Import-DscResource -ModuleName xComputerManagement
 
     Node 'localhost' {
 
-        LocalConfigurationManager
-        {
+        LocalConfigurationManager {
             RebootNodeIfNeeded = $true
-            ActionAfterReboot = 'ContinueConfiguration'
+            ActionAfterReboot  = 'ContinueConfiguration'
         }
 
-        WindowsFeature Hyper-V {
-            Ensure = "Present"
-            Name   = "Hyper-V"
-            IncludeAllSubFeature = $true
-
+        xWaitForADDomain DscForestWait { 
+            DomainName           = $domainname 
+            DomainUserCredential = $domainCred
+            RetryCount           = $RetryCount 
+            RetryIntervalSec     = $RetryIntervalSec
         }
+
+        xComputer JoinDomain
+        {
+            Name       = $machinename 
+            DomainName = $domainname 
+            Credential = $domainCred  # Credential to join to domain
+            DependsOn  = "[xWaitForADDomain]DscForestWait"
+        }
+
+
 
         
 
