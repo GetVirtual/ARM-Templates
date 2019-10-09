@@ -24,7 +24,7 @@ Configuration FS {
             DomainName           = $domainname 
             DomainUserCredential = $domainCred
             RetryCount           = 20 
-            RetryIntervalSec     = 30
+            RetryIntervalSec     = 60
         }
 
         xComputer JoinDomain
