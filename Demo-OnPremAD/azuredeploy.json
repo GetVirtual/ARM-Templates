@@ -87,13 +87,13 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('vnetPrefix')]",
-                        "168.63.129.16"
+                        "[variables('vnetPrefix')]"
                     ]
                 },
                 "dhcpOptions": {
                     "dnsServers": [
-                        "[variables('vmDCstaticprivip')]"
+                        "[variables('vmDCstaticprivip')]",
+                        "168.63.129.16"
                     ]
                 },
                 "subnets": [
@@ -366,11 +366,8 @@
                         "domainCred": {
                             "userName": "[parameters('AdminUserName')]",
                             "password": "[parameters('AdminPassword')]"
-                        },
-                        "safemodeCred": {
-                            "userName": "pwdonly",
-                            "password": "[parameters('domainsafemode')]"
                         }
+  
                     }
                 }
             },
