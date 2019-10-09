@@ -220,6 +220,8 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
+                        
+                        
                         "domainname": "[parameters('domainname')]"
                     }
                 },
@@ -375,9 +377,6 @@
                 "displayName": "vmFSextdsc"
             }
         }
-
-
-
 
     ],
     "outputs": {
