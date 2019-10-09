@@ -5,7 +5,10 @@
         "AdminUserName": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "vmadmin"
+            "defaultValue": "vmadmin",
+            "metadata": {
+                "description": "Name of the Administrator User for all machines"
+            }
         },
         "AdminPassword": {
             "type": "securestring",
@@ -34,7 +37,14 @@
             "type": "string",
             "minLength": 1,
             "defaultValue": "jrlobenz.rockz"
+        },
+        "machinename": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "OnPrem-FS"
         }
+
+
 
 
     },
@@ -220,8 +230,8 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
-                        
-                        
+
+
                         "domainname": "[parameters('domainname')]"
                     }
                 },
@@ -360,7 +370,7 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "machinename": "[variables('vmFSName')]"
+                        "machinename": "[parameters('machinename')]"
                     }
                 },
                 "protectedSettings": {
@@ -369,7 +379,7 @@
                             "userName": "[parameters('AdminUserName')]",
                             "password": "[parameters('AdminPassword')]"
                         }
-  
+
                     }
                 }
             },

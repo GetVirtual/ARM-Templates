@@ -1,11 +1,12 @@
 Configuration FS {
 
     [Parameter(Mandatory)]             
-    [string]$domainname,             
-    [Parameter(Mandatory)]            
-    [pscredential]$domainCred,
+    [string]$domainname,
     [Parameter(Mandatory)]
-    [string]$machinename
+    [string]$machinename,             
+    [Parameter(Mandatory)]            
+    [pscredential]$domainCred
+
 
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
