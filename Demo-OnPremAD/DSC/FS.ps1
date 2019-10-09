@@ -3,7 +3,7 @@ Configuration FS {
     [Parameter(Mandatory)]             
     [string]$domainname,
     [Parameter(Mandatory)]
-    [string]$machinename,             
+    [string]$maname,             
     [Parameter(Mandatory)]            
     [pscredential]$domainCred
 
@@ -21,13 +21,13 @@ Configuration FS {
         xWaitForADDomain DscForestWait { 
             DomainName           = $domainname 
             DomainUserCredential = $domainCred
-            RetryCount           = $RetryCount 
-            RetryIntervalSec     = $RetryIntervalSec
+            RetryCount           = 20 
+            RetryIntervalSec     = 30
         }
 
         xComputer JoinDomain
         {
-            Name       = $machinename 
+            Name       = $maname 
             DomainName = $domainname 
             Credential = $domainCred  # Credential to join to domain
             DependsOn  = "[xWaitForADDomain]DscForestWait"

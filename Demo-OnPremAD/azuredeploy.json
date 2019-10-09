@@ -38,7 +38,7 @@
             "minLength": 1,
             "defaultValue": "jrlobenz.rockz"
         },
-        "machinename": {
+        "maname": {
             "type": "string",
             "minLength": 1,
             "defaultValue": "OnPrem-FS"
@@ -370,7 +370,7 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "machinename": "[parameters('machinename')]"
+                        "machinename": "[parameters('maname')]"
                     }
                 },
                 "protectedSettings": {
