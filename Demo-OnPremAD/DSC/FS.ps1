@@ -1,12 +1,14 @@
 Configuration FS {
-
-    [Parameter(Mandatory)]             
-    [string]$domainname,
-    [Parameter(Mandatory)]
-    [string]$maname,             
-    [Parameter(Mandatory)]            
-    [pscredential]$domainCred
-
+    
+    param             
+    (   
+        [Parameter(Mandatory)]             
+        [string]$domainname,
+        [Parameter(Mandatory)]
+        [string]$nodename,             
+        [Parameter(Mandatory)]            
+        [pscredential]$domainCred
+    )  
 
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
@@ -27,7 +29,7 @@ Configuration FS {
 
         xComputer JoinDomain
         {
-            Name       = $maname 
+            Name       = $nodename 
             DomainName = $domainname 
             Credential = $domainCred  # Credential to join to domain
             DependsOn  = "[xWaitForADDomain]DscForestWait"
