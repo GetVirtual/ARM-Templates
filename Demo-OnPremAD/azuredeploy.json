@@ -12,11 +12,10 @@
         },
         "AdminPassword": {
             "type": "securestring",
-            "defaultValue": "$ecurity#123"
-        },
-        "WindowsOSVersion": {
-            "type": "string",
-            "defaultValue": "2019-Datacenter"
+            "defaultValue": "$ecurity#123",
+            "metadata": {
+                "description": "Same Password for everything - don´t do this at home! ;-)"
+            }
         },
         "dnsLabelDC": {
             "type": "string",
@@ -38,24 +37,11 @@
             "minLength": 1,
             "defaultValue": "onpremclientarm"
         },
-        "domainsafemode": {
-            "type": "securestring",
-            "minLength": 1,
-            "defaultValue": "$ecurity#123"
-        },
         "domainname": {
             "type": "string",
             "minLength": 1,
             "defaultValue": "jrlobenz.rockz"
-        },
-        "nodename": {
-            "type": "string",
-            "minLength": 1,
-            "defaultValue": "OnPrem-FS"
         }
-
-
-
 
     },
     "variables": {
@@ -65,11 +51,8 @@
 
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
-
-        "vmClientImagePublisher": "MicrosoftWindowsDesktop",
-        "vmClientImageOffer": "Windows-10",
-        "vmCLientWindowsOSVersion": "19h1-pro",
-
+        "WindowsOSVersion": "2019-Datacenter",
+            
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
         "vmDCstaticprivip": "10.10.0.4",
@@ -227,7 +210,7 @@
                     "imageReference": {
                         "publisher": "[variables('vmImagePublisher')]",
                         "offer": "[variables('vmImageOffer')]",
-                        "sku": "[parameters('WindowsOSVersion')]",
+                        "sku": "[variables('WindowsOSVersion')]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -283,7 +266,7 @@
                         },
                         "safemodeCred": {
                             "userName": "pwdonly",
-                            "password": "[parameters('domainsafemode')]"
+                            "password": "[parameters('AdminPassword')]"
                         }
                     }
                 }
@@ -366,7 +349,7 @@
                     "imageReference": {
                         "publisher": "[variables('vmImagePublisher')]",
                         "offer": "[variables('vmImageOffer')]",
-                        "sku": "[parameters('WindowsOSVersion')]",
+                        "sku": "[variables('WindowsOSVersion')]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -410,13 +393,13 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "nodename": "[parameters('nodename')]"
+                        "nodename": "[variables('vmFSName')]"
                     }
                 },
                 "protectedSettings": {
                     "configurationArguments": {
                         "domainCred": {
-                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",
                             "password": "[parameters('AdminPassword')]"
                         }
 
@@ -498,7 +481,7 @@
                     "imageReference": {
                         "publisher": "[variables('vmImagePublisher')]",
                         "offer": "[variables('vmImageOffer')]",
-                        "sku": "[parameters('WindowsOSVersion')]",
+                        "sku": "[variables('WindowsOSVersion')]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -542,13 +525,13 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "nodename": "[parameters('nodename')]"
+                        "nodename": "[variables('vmFileName')]"
                     }
                 },
                 "protectedSettings": {
                     "configurationArguments": {
                         "domainCred": {
-                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",
                             "password": "[parameters('AdminPassword')]"
                         }
 
@@ -618,19 +601,19 @@
                 "displayName": "vmClient"
             },
             "properties": {
-                "hardwareProClient": {
+                "hardwareProfile": {
                     "vmSize": "[variables('vmClientVmSize')]"
                 },
-                "osProClient": {
+                "osProfile": {
                     "computerName": "[variables('vmClientName')]",
                     "adminUsername": "[parameters('AdminUserName')]",
                     "adminPassword": "[parameters('AdminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "publisher": "[variables('vmClientImagePublisher')]",
-                        "offer": "[variables('vmClientImageOffer')]",
-                        "sku": "[variables('vmCLientWindowsOSVersion')]",
+                        "publisher": "[variables('vmImagePublisher')]",
+                        "offer": "[variables('vmImageOffer')]",
+                        "sku": "[variables('WindowsOSVersion')]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -674,13 +657,13 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "nodename": "[parameters('nodename')]"
+                        "nodename": "[variables('vmClientName')]"
                     }
                 },
                 "protectedSettings": {
                     "configurationArguments": {
                         "domainCred": {
-                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",
                             "password": "[parameters('AdminPassword')]"
                         }
 
