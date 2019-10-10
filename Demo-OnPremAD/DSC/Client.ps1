@@ -1,4 +1,4 @@
-Configuration FS {
+Configuration Client {
     
     param             
     (   
@@ -34,13 +34,6 @@ Configuration FS {
             DomainName = $domainname 
             Credential = $domainCred  # Credential to join to domain
             DependsOn  = "[xWaitForADDomain]DscForestWait"
-        }
-
-        WindowsFeature installADFS {
-            #install ADFS
-            Ensure    = "Present"
-            Name      = "ADFS-Federation"
-            DependsOn = "[xComputer]JoinDomain"
         }
 
         

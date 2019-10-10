@@ -28,6 +28,16 @@
             "minLength": 1,
             "defaultValue": "onpremfsarm"
         },
+        "dnsLabelFile": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "onpremfilearm"
+        },
+        "dnsLabelClient": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "onpremclientarm"
+        },
         "domainsafemode": {
             "type": "securestring",
             "minLength": 1,
@@ -56,6 +66,10 @@
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
 
+        "vmClientImagePublisher": "MicrosoftWindowsDesktop",
+        "vmClientImageOffer": "Windows-10",
+        "vmCLientWindowsOSVersion": "19h1-pro",
+
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
         "vmDCstaticprivip": "10.10.0.4",
@@ -74,13 +88,39 @@
         "vmFSSubnetRef": "[concat(variables('vmFSVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmFSNicName": "[concat(variables('vmFSName'), 'NetworkInterface')]",
 
+        "vmFileName": "OnPrem-File",
+        "vmFilepipname": "OnPrem-File-pip",
+        "vmFilestaticprivip": "10.10.0.6",
+        "vmFileVmSize": "Standard_B4ms",
+        "vmFileosdisktype": "Premium_LRS",
+        "vmFileVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+        "vmFileSubnetRef": "[concat(variables('vmFileVnetID'), '/subnets/', variables('vnetSubnetName'))]",
+        "vmFileNicName": "[concat(variables('vmFileName'), 'NetworkInterface')]",
+
+        "vmClientName": "OnPrem-Client",
+        "vmClientpipname": "OnPrem-Client-pip",
+        "vmClientstaticprivip": "10.10.0.7",
+        "vmClientVmSize": "Standard_B4ms",
+        "vmClientosdisktype": "Premium_LRS",
+        "vmClientVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+        "vmClientSubnetRef": "[concat(variables('vmClientVnetID'), '/subnets/', variables('vnetSubnetName'))]",
+        "vmClientNicName": "[concat(variables('vmClientName'), 'NetworkInterface')]",
+
         "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/DC.zip",
         "DSCDCfilename": "DC.ps1",
         "DSCDCfunction": "DC",
 
         "DSCFSurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/FS.zip",
         "DSCFSfilename": "FS.ps1",
-        "DSCFSfunction": "FS"
+        "DSCFSfunction": "FS",
+
+        "DSCFileurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/File.zip",
+        "DSCFilefilename": "File.ps1",
+        "DSCFilefunction": "File",
+
+        "DSCClienturl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/Client.zip",
+        "DSCClientname": "Client.ps1",
+        "DSCClientfunction": "Client"
 
     },
     "resources": [
@@ -376,7 +416,7 @@
                 "protectedSettings": {
                     "configurationArguments": {
                         "domainCred": {
-                            "userName": "[parameters('AdminUserName')]",
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
                             "password": "[parameters('AdminPassword')]"
                         }
 
@@ -385,6 +425,270 @@
             },
             "tags": {
                 "displayName": "vmFSextdsc"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('vmFilepipname')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelFile')]"
+                }
+            },
+            "tags": {
+                "displayName": "vmFilepip"
+            }
+        },
+
+        {
+            "name": "[variables('vmFileNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmFilepipname'))]"
+            ],
+            "tags": {
+                "displayName": "vmFileNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddress": "[variables('vmFilestaticprivip')]",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[variables('vmFileSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmFilepipname'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[variables('vmFileName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFileNicName'))]"
+            ],
+            "tags": {
+                "displayName": "vmFile"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmFileVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmFileName')]",
+                    "adminUsername": "[parameters('AdminUserName')]",
+                    "adminPassword": "[parameters('AdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('vmImagePublisher')]",
+                        "offer": "[variables('vmImageOffer')]",
+                        "sku": "[parameters('WindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "OnPrem-File-Disk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('vmFileosdisktype')]"
+                        },
+                        "diskSizeGB": 512
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFileNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmFileName'), '/Microsoft.Powershell.DSC')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmFileName'))]"
+
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.76",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "configuration": {
+                        "url": "[variables('DSCFileurl')]",
+                        "script": "[variables('DSCFilefilename')]",
+                        "function": "[variables('DSCFilefunction')]"
+                    },
+                    "configurationArguments": {
+                        "domainname": "[parameters('domainname')]",
+                        "nodename": "[parameters('nodename')]"
+                    }
+                },
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "domainCred": {
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
+                            "password": "[parameters('AdminPassword')]"
+                        }
+
+                    }
+                }
+            },
+            "tags": {
+                "displayName": "vmFileextdsc"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('vmClientpipname')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelClient')]"
+                }
+            },
+            "tags": {
+                "displayName": "vmClientpip"
+            }
+        },
+
+        {
+            "name": "[variables('vmClientNicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmClientpipname'))]"
+            ],
+            "tags": {
+                "displayName": "vmClientNic"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddress": "[variables('vmClientstaticprivip')]",
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[variables('vmClientSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmClientpipname'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[variables('vmClientName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmClientNicName'))]"
+            ],
+            "tags": {
+                "displayName": "vmClient"
+            },
+            "properties": {
+                "hardwareProClient": {
+                    "vmSize": "[variables('vmClientVmSize')]"
+                },
+                "osProClient": {
+                    "computerName": "[variables('vmClientName')]",
+                    "adminUsername": "[parameters('AdminUserName')]",
+                    "adminPassword": "[parameters('AdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('vmClientImagePublisher')]",
+                        "offer": "[variables('vmClientImageOffer')]",
+                        "sku": "[variables('vmCLientWindowsOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "OnPrem-Client-Disk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('vmClientosdisktype')]"
+                        },
+                        "diskSizeGB": 512
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmClientNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmClientName'), '/Microsoft.Powershell.DSC')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmClientName'))]"
+
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.76",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "configuration": {
+                        "url": "[variables('DSCClienturl')]",
+                        "script": "[variables('DSCClientname')]",
+                        "function": "[variables('DSCClientfunction')]"
+                    },
+                    "configurationArguments": {
+                        "domainname": "[parameters('domainname')]",
+                        "nodename": "[parameters('nodename')]"
+                    }
+                },
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "domainCred": {
+                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",      
+                            "password": "[parameters('AdminPassword')]"
+                        }
+
+                    }
+                }
+            },
+            "tags": {
+                "displayName": "vmClientextdsc"
             }
         }
 
