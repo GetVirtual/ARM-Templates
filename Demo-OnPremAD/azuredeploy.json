@@ -40,7 +40,7 @@
         "domainname": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "jrlobenz.rockz"
+            "defaultValue": "jrlobenz.rocks"
         }
 
     },

@@ -11,7 +11,8 @@ Configuration DC {
 
     )    
 
-    Import-DscResource -ModuleName xActiveDirectory   
+    Import-DscResource -ModuleName xActiveDirectory  
+    Import-DscResource -ModuleName xAdcsDeployment 
 
     Node 'localhost' {
 
@@ -31,7 +32,6 @@ Configuration DC {
             Name   = "RSAT-ADDS"             
         }  
 
-        # No slash at end of folder paths            
         xADDomain FirstDS             
         {             
             DomainName                    = $domainname             
@@ -40,6 +40,34 @@ Configuration DC {
             DatabasePath                  = 'C:\NTDS'            
             LogPath                       = 'C:\NTDS'            
             DependsOn                     = "[WindowsFeature]ADDSInstall"           
+        } 
+
+        WindowsFeature ADCS-Cert-Authority
+        {
+               Ensure = 'Present'
+               Name = 'ADCS-Cert-Authority'
+               DependsOn = "[xADDomain]FristDS"
+        }
+        xADCSCertificationAuthority ADCS
+        {
+            Ensure = 'Present'
+            Credential = $domainCred
+            CAType = 'EnterpriseRootCA'
+            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'              
+        }
+        WindowsFeature ADCS-Web-Enrollment
+        {
+            Ensure = 'Present'
+            Name = 'ADCS-Web-Enrollment'
+
+            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
+        }
+        xADCSWebEnrollment CertSrv
+        {
+            Ensure = 'Present'
+            Credential = $domainCred
+            IsSingleInstance = "yes"
+            DependsOn = '[WindowsFeature]ADCS-Web-Enrollment','[xADCSCertificationAuthority]ADCS'
         } 
 
     
