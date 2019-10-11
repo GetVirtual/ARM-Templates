@@ -7,12 +7,16 @@ Configuration FS {
         [Parameter(Mandatory)]
         [string]$nodename,             
         [Parameter(Mandatory)]            
-        [pscredential]$domainCred
+        [pscredential]$domainCred,
+        [Parameter(Mandatory)]            
+        [string]$CARootName,
+        [Parameter(Mandatory)]            
+        [string]$CAServerFQDN
     )  
 
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
-    
+    Import-DscResource -ModuleName CertificateDsc    
 
     Node 'localhost' {
 
@@ -36,11 +40,50 @@ Configuration FS {
             DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
 
-        WindowsFeature installADFS {
-            #install ADFS
+        WindowsFeature InstallADFS {
             Ensure    = "Present"
             Name      = "ADFS-Federation"
             DependsOn = "[xComputer]JoinDomain"
+        }
+
+        WaitForCertificateServices RootCA
+        {
+            CARootName   = $CARootName
+            CAServerFQDN = $CAServerFQDN
+            RetryIntervalSeconds = 60
+            RetryCount = 20
+            DependsOn = "[xComputer]JoinDomain"
+        }
+
+        CertReq SSLCert
+        {
+            # https://github.com/PowerShell/CertificateDsc/wiki/CertReq
+            # Subject
+            # CARootname opt
+            # CAServerFQDN opt
+            # SubjectAltName ?
+            # Friendly Name
+            # Credentials?
+
+
+            CARootName          = $CARootName
+            CAServerFQDN        = $CAServerFQDN
+            Subject             = $nodename
+            KeyLength           = '2048'
+            Exportable          = $true
+            ProviderName        = '"Microsoft RSA SChannel Cryptographic Provider"'
+            OID                 = '1.3.6.1.5.5.7.3.1'
+            KeyUsage            = '0xa0'
+            CertificateTemplate = 'WebServer'
+            SubjectAltName      = 'dns=fabrikam.com&dns=contoso.com'
+            AutoRenew           = $true
+            FriendlyName        = 'SSL Cert for ADFS'
+            Credential          = $domainCred
+            KeyType             = 'RSA'
+            RequestType         = 'CMC'
+            DependsOn =         = "[WaitForCertificateServices]RootCA"
+        
+        
         }
 
         

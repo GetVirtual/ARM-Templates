@@ -393,7 +393,9 @@
                     },
                     "configurationArguments": {
                         "domainname": "[parameters('domainname')]",
-                        "nodename": "[variables('vmFSName')]"
+                        "nodename": "[variables('vmFSName')]",
+                        "CARootName": "[variables('vmDCName')]",
+                        "CAServerFQDN" : "[concat(variables('vmDCName'), '.', parameters('domainname'))]"
                     }
                 },
                 "protectedSettings": {
