@@ -12,7 +12,7 @@ Configuration Client {
 
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
-    
+    Import-DscResource -ModuleName xPendingReboot
 
     Node 'localhost' {
 
@@ -37,6 +37,11 @@ Configuration Client {
         }
 
         
+        xPendingReboot Reboot1
+        { 
+            Name      = "RebootServer"
+            DependsOn = "[xComputer]JoinDomain"
+        }
 
     }
 }

@@ -17,6 +17,7 @@ Configuration FS {
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
     Import-DscResource -ModuleName CertificateDsc    
+    Import-DscResource -ModuleName xPendingReboot
 
     Node 'localhost' {
 
@@ -39,10 +40,16 @@ Configuration FS {
             DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
 
+        xPendingReboot Reboot1
+        { 
+            Name      = "RebootServer"
+            DependsOn = "[xComputer]JoinDomain"
+        }
+
         WindowsFeature InstallADFS {
             Ensure    = "Present"
             Name      = "ADFS-Federation"
-            DependsOn = "[xComputer]JoinDomain"
+            DependsOn = "[xPendingReboot]Reboot1"
         }
 
         WaitForCertificateServices RootCA {
@@ -50,7 +57,7 @@ Configuration FS {
             CAServerFQDN         = $CAServerFQDN
             RetryCount           = 20
             RetryIntervalSeconds = 60
-            DependsOn            = "[xComputer]JoinDomain"
+            DependsOn            = "[xPendingReboot]Reboot1"
         }
 
         CertReq SSLCert {

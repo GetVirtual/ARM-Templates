@@ -12,7 +12,7 @@ Configuration File {
 
     Import-DscResource -ModuleName xActiveDirectory   
     Import-DscResource -ModuleName xComputerManagement
-    
+    Import-DscResource -ModuleName xPendingReboot
 
     Node 'localhost' {
 
@@ -35,7 +35,13 @@ Configuration File {
             Credential = $domainCred  # Credential to join to domain
             DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
-
+        
+        
+        xPendingReboot Reboot1
+        { 
+            Name      = "RebootServer"
+            DependsOn = "[xComputer]JoinDomain"
+        }
         
 
     }

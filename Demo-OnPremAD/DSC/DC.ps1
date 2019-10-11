@@ -13,6 +13,7 @@ Configuration DC {
 
     Import-DscResource -ModuleName xActiveDirectory  
     Import-DscResource -ModuleName xAdcsDeployment 
+    Import-DscResource -ModuleName xPendingReboot
 
     Node 'localhost' {
 
@@ -56,15 +57,21 @@ Configuration DC {
         WindowsFeature ADCS-Web-Enrollment {
             Ensure    = 'Present'
             Name      = 'ADCS-Web-Enrollment'
-
             DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
         }
+
         xADCSWebEnrollment CertSrv {
             Ensure           = 'Present'
             Credential       = $domainCred
             IsSingleInstance = "yes"
             DependsOn        = '[WindowsFeature]ADCS-Web-Enrollment', '[xADCSCertificationAuthority]ADCS'
-        } 
+        }
+
+        xPendingReboot Reboot1
+        { 
+            Name      = "RebootServer"
+            DependsOn = "[xADCSWebEnrollment]CertSrv"
+        }
 
 
     
