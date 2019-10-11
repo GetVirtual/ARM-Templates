@@ -32,8 +32,7 @@ Configuration DC {
             Name   = "RSAT-ADDS"             
         }  
 
-        xADDomain FirstDS             
-        {             
+        xADDomain FirstDS {             
             DomainName                    = $domainname             
             DomainAdministratorCredential = $domainCred             
             SafemodeAdministratorPassword = $safemodeCred          
@@ -42,12 +41,30 @@ Configuration DC {
             DependsOn                     = "[WindowsFeature]ADDSInstall"           
         } 
 
-        WindowsFeature ADCS-Cert-Authority
-        {
-               Ensure = 'Present'
-               Name = 'ADCS-Cert-Authority'
-               DependsOn = "[xADDomain]FristDS"
+        WindowsFeature ADCS-Cert-Authority {
+            Ensure    = 'Present'
+            Name      = 'ADCS-Cert-Authority'
+            DependsOn = "[xADDomain]FirstDS"
         }
+
+        xADCSCertificationAuthority ADCS {
+            Ensure     = 'Present'
+            Credential = $domainCred
+            CAType     = 'EnterpriseRootCA'
+            DependsOn  = '[WindowsFeature]ADCS-Cert-Authority'              
+        }
+        WindowsFeature ADCS-Web-Enrollment {
+            Ensure    = 'Present'
+            Name      = 'ADCS-Web-Enrollment'
+
+            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
+        }
+        xADCSWebEnrollment CertSrv {
+            Ensure           = 'Present'
+            Credential       = $domainCred
+            IsSingleInstance = "yes"
+            DependsOn        = '[WindowsFeature]ADCS-Web-Enrollment', '[xADCSCertificationAuthority]ADCS'
+        } 
 
 
     
