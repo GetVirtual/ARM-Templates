@@ -69,7 +69,7 @@ Configuration FS {
             Credential          = $domainCred
             KeyType             = 'RSA'
             RequestType         = 'CMC'
-            DependsOn           = = "[WaitForCertificateServices]RootCA"
+            DependsOn           = "[WaitForCertificateServices]RootCA"
         
         
         }
