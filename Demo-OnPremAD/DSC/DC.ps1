@@ -48,27 +48,7 @@ Configuration DC {
                Name = 'ADCS-Cert-Authority'
                DependsOn = "[xADDomain]FristDS"
         }
-        xADCSCertificationAuthority ADCS
-        {
-            Ensure = 'Present'
-            Credential = $domainCred
-            CAType = 'EnterpriseRootCA'
-            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'              
-        }
-        WindowsFeature ADCS-Web-Enrollment
-        {
-            Ensure = 'Present'
-            Name = 'ADCS-Web-Enrollment'
 
-            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
-        }
-        xADCSWebEnrollment CertSrv
-        {
-            Ensure = 'Present'
-            Credential = $domainCred
-            IsSingleInstance = "yes"
-            DependsOn = '[WindowsFeature]ADCS-Web-Enrollment','[xADCSCertificationAuthority]ADCS'
-        } 
 
     
         
