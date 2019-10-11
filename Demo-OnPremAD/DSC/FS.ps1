@@ -32,8 +32,7 @@ Configuration FS {
             RetryIntervalSec     = 60
         }
 
-        xComputer JoinDomain
-        {
+        xComputer JoinDomain {
             Name       = $nodename 
             DomainName = $domainname 
             Credential = $domainCred  # Credential to join to domain
@@ -46,26 +45,15 @@ Configuration FS {
             DependsOn = "[xComputer]JoinDomain"
         }
 
-        WaitForCertificateServices RootCA
-        {
-            CARootName   = $CARootName
-            CAServerFQDN = $CAServerFQDN
+        WaitForCertificateServices RootCA {
+            CARootName           = $CARootName
+            CAServerFQDN         = $CAServerFQDN
+            RetryCount           = 20
             RetryIntervalSeconds = 60
-            RetryCount = 20
-            DependsOn = "[xComputer]JoinDomain"
+            DependsOn            = "[xComputer]JoinDomain"
         }
 
-        CertReq SSLCert
-        {
-            # https://github.com/PowerShell/CertificateDsc/wiki/CertReq
-            # Subject
-            # CARootname opt
-            # CAServerFQDN opt
-            # SubjectAltName ?
-            # Friendly Name
-            # Credentials?
-
-
+        CertReq SSLCert {
             CARootName          = $CARootName
             CAServerFQDN        = $CAServerFQDN
             Subject             = $nodename
@@ -81,7 +69,7 @@ Configuration FS {
             Credential          = $domainCred
             KeyType             = 'RSA'
             RequestType         = 'CMC'
-            DependsOn =         = "[WaitForCertificateServices]RootCA"
+            DependsOn           = = "[WaitForCertificateServices]RootCA"
         
         
         }
