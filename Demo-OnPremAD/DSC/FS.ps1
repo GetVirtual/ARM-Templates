@@ -15,9 +15,8 @@ Configuration FS {
     )  
 
     Import-DscResource -ModuleName xActiveDirectory   
-    Import-DscResource -ModuleName xComputerManagement
     Import-DscResource -ModuleName CertificateDsc    
-    Import-DscResource -ModuleName xPendingReboot
+    Import-DscResource -ModuleName ComputerManagementDsc
 
     Node 'localhost' {
 
@@ -33,23 +32,24 @@ Configuration FS {
             RetryIntervalSec     = 60
         }
 
-        xComputer JoinDomain {
+        Computer JoinDomain
+        {
             Name       = $nodename 
             DomainName = $domainname 
-            Credential = $domainCred  # Credential to join to domain
+            Credential = $domainCred
             DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
 
-        xPendingReboot Reboot1
-        { 
-            Name      = "RebootServer"
-            DependsOn = "[xComputer]JoinDomain"
+        PendingReboot RebootAfterDomainJoin
+        {
+            Name = 'DomainJoin'
+            DependsOn = "[Computer]JoinDomain"
         }
 
         WindowsFeature InstallADFS {
             Ensure    = "Present"
             Name      = "ADFS-Federation"
-            DependsOn = "[xPendingReboot]Reboot1"
+            DependsOn = "[PendingReboot]RebootAfterDomainJoin"
         }
 
         WaitForCertificateServices RootCA {
@@ -57,7 +57,7 @@ Configuration FS {
             CAServerFQDN         = $CAServerFQDN
             RetryCount           = 20
             RetryIntervalSeconds = 60
-            DependsOn            = "[xPendingReboot]Reboot1"
+            DependsOn = "[PendingReboot]RebootAfterDomainJoin"
         }
 
         CertReq SSLCert {
@@ -69,7 +69,7 @@ Configuration FS {
             ProviderName        = '"Microsoft RSA SChannel Cryptographic Provider"'
             OID                 = '1.3.6.1.5.5.7.3.1'
             KeyUsage            = '0xa0'
-            CertificateTemplate = 'WebServer'
+            CertificateTemplate = 'Computer'
             AutoRenew           = $true
             FriendlyName        = 'SSL Cert for ADFS'
             Credential          = $domainCred

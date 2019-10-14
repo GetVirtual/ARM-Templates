@@ -11,8 +11,7 @@ Configuration File {
     )  
 
     Import-DscResource -ModuleName xActiveDirectory   
-    Import-DscResource -ModuleName xComputerManagement
-    Import-DscResource -ModuleName xPendingReboot
+    Import-DscResource -ModuleName ComputerManagementDsc
 
     Node 'localhost' {
 
@@ -28,19 +27,18 @@ Configuration File {
             RetryIntervalSec     = 60
         }
 
-        xComputer JoinDomain
+        Computer JoinDomain
         {
             Name       = $nodename 
             DomainName = $domainname 
-            Credential = $domainCred  # Credential to join to domain
+            Credential = $domainCred
             DependsOn  = "[xWaitForADDomain]DscForestWait"
         }
-        
-        
-        xPendingReboot Reboot1
-        { 
-            Name      = "RebootServer"
-            DependsOn = "[xComputer]JoinDomain"
+
+        PendingReboot RebootAfterDomainJoin
+        {
+            Name = 'DomainJoin'
+            DependsOn = "[Computer]JoinDomain"
         }
         
 
