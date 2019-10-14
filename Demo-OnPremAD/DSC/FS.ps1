@@ -60,26 +60,7 @@ Configuration FS {
             DependsOn            = "[xPendingReboot]Reboot1"
         }
 
-        CertReq SSLCert {
-            CARootName          = $CARootName
-            CAServerFQDN        = $CAServerFQDN
-            Subject             = $nodename
-            KeyLength           = '2048'
-            Exportable          = $true
-            ProviderName        = '"Microsoft RSA SChannel Cryptographic Provider"'
-            OID                 = '1.3.6.1.5.5.7.3.1'
-            KeyUsage            = '0xa0'
-            CertificateTemplate = 'WebServer'
-            SubjectAltName      = 'dns=fabrikam.com&dns=contoso.com'
-            AutoRenew           = $true
-            FriendlyName        = 'SSL Cert for ADFS'
-            Credential          = $domainCred
-            KeyType             = 'RSA'
-            RequestType         = 'CMC'
-            DependsOn           = "[WaitForCertificateServices]RootCA"
-        
-        
-        }
+
 
         
 

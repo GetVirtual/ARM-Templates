@@ -253,8 +253,7 @@
                         "function": "[variables('DSCDCfunction')]"
                     },
                     "configurationArguments": {
-
-
+                        "CARootName": "[variables('vmDCName')]",
                         "domainname": "[parameters('domainname')]"
                     }
                 },
@@ -331,7 +330,8 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2017-03-30",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
             ],
             "tags": {
                 "displayName": "vmFS"

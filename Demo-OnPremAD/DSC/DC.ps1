@@ -7,7 +7,9 @@ Configuration DC {
         [Parameter(Mandatory)]            
         [pscredential]$safemodeCred,
         [Parameter(Mandatory)]            
-        [pscredential]$domainCred
+        [pscredential]$domainCred,
+        [Parameter(Mandatory)]            
+        [string]$CARootName
 
     )    
 
@@ -48,16 +50,24 @@ Configuration DC {
             DependsOn = "[xADDomain]FirstDS"
         }
 
-        xADCSCertificationAuthority ADCS {
-            Ensure     = 'Present'
-            Credential = $domainCred
-            CAType     = 'EnterpriseRootCA'
-            DependsOn  = '[WindowsFeature]ADCS-Cert-Authority'              
-        }
         WindowsFeature ADCS-Web-Enrollment {
             Ensure    = 'Present'
             Name      = 'ADCS-Web-Enrollment'
             DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
+        }
+
+        WindowsFeature ADCS-Web-Enrollment {
+            Ensure    = 'Present'
+            Name      = 'RSAT-ADCS-Mgmt'
+            DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
+        }
+
+        xADCSCertificationAuthority ADCS {
+            Ensure     = 'Present'
+            Credential = $domainCred
+            CAType     = 'EnterpriseRootCA'
+            CACommonName = $CARootName
+            DependsOn  = '[WindowsFeature]ADCS-Cert-Authority'              
         }
 
         xADCSWebEnrollment CertSrv {
@@ -66,6 +76,7 @@ Configuration DC {
             IsSingleInstance = "yes"
             DependsOn        = '[WindowsFeature]ADCS-Web-Enrollment', '[xADCSCertificationAuthority]ADCS'
         }
+        
 
         xPendingReboot Reboot1
         { 
