@@ -1,3 +1,4 @@
 azuredeploy.ps1
+azurecleanup.ps1
 publishDSC.ps1
 clipboard.txt

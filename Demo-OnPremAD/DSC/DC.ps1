@@ -56,7 +56,7 @@ Configuration DC {
             DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
         }
 
-        WindowsFeature ADCS-Web-Enrollment {
+        WindowsFeature RSAT-ADCS-Mgmt {
             Ensure    = 'Present'
             Name      = 'RSAT-ADCS-Mgmt'
             DependsOn = '[WindowsFeature]ADCS-Cert-Authority'
