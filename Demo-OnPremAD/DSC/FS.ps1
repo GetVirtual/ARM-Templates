@@ -66,7 +66,7 @@ Configuration FS {
             Subject             = $nodename
             KeyLength           = '2048'
             Exportable          = $true
-            ProviderName        = '"Microsoft RSA SChannel Cryptographic Provider"'
+            ProviderName        = "Microsoft RSA SChannel Cryptographic Provider"
             OID                 = '1.3.6.1.5.5.7.3.1'
             KeyUsage            = '0xa0'
             CertificateTemplate = 'Computer'
