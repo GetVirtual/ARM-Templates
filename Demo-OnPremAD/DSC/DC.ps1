@@ -77,11 +77,7 @@ Configuration DC {
             DependsOn        = '[WindowsFeature]ADCS-Web-Enrollment', '[xADCSCertificationAuthority]ADCS'
         }
         
-        PendingReboot DCconfigured
-        {
-            Name = 'DCconfigured'
-            DependsOn = "[xADCSWebEnrollment]CertSrv"
-        }
+
 
 
     
