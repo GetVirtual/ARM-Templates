@@ -76,6 +76,7 @@ Configuration FS {
             KeyType             = 'RSA'
             RequestType         = 'CMC'
             DependsOn           = "[WaitForCertificateServices]RootCA"
+            PsDscRunAsCredential = $domainCred
         }
 
 
