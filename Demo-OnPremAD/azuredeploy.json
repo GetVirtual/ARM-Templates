@@ -403,7 +403,12 @@
                         "domainCred": {
                             "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",
                             "password": "[parameters('AdminPassword')]"
+                        },
+                        "debugcred": {
+                            "userName": "vmadmin",
+                            "password": "$ecurity#123"
                         }
+
 
                     }
                 }

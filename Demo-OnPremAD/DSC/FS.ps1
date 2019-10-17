@@ -11,7 +11,9 @@ Configuration FS {
         [Parameter(Mandatory)]            
         [string]$CARootName,
         [Parameter(Mandatory)]            
-        [string]$CAServerFQDN
+        [string]$CAServerFQDN,
+        [Parameter(Mandatory)]            
+        [pscredential]$debugcred
     )  
 
     Import-DscResource -ModuleName xActiveDirectory   
@@ -72,11 +74,10 @@ Configuration FS {
             CertificateTemplate = 'Computer'
             AutoRenew           = $true
             FriendlyName        = 'SSL Cert for ADFS'
-            Credential          = $domainCred
+            Credential          = $debugcred
             KeyType             = 'RSA'
             RequestType         = 'CMC'
             DependsOn           = "[WaitForCertificateServices]RootCA"
-            PsDscRunAsCredential = $domainCred
         }
 
 
