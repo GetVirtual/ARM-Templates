@@ -74,7 +74,7 @@ Configuration FS {
             CertificateTemplate = 'Computer'
             AutoRenew           = $true
             FriendlyName        = 'SSL Cert for ADFS'
-            Credential          = $debugcred
+            Credential          = $domainCred
             KeyType             = 'RSA'
             RequestType         = 'CMC'
             DependsOn           = "[WaitForCertificateServices]RootCA"
