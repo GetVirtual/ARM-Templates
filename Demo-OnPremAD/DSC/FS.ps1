@@ -79,7 +79,6 @@ Configuration FS {
             RequestType         = 'CMC'
             DependsOn           = "[WaitForCertificateServices]RootCA"
             
-            SubjectAltName      = "subjectaltname"
             Subject             = "CN=Onprem-FS.jrlobenz.rocks"
             CAType = "Enterprise"
             UseMachineContext = $true
