@@ -6,17 +6,27 @@
 </a>
 
 
-## Description ##
+### Description ###
 
-The ARM Template deploys
+ARM Template to simulate "On Premises services" with preconfigured DC and prepared servers for AD FS, Fileserver, etc.
+Examples for test scenarios:
+* AD Connect (Sync AD and AAD)
+* Azure File Sync (https://docs.microsoft.com/en-us/azure/storage/files/storage-files-introduction)
+* and many more hybrid scenarios you maybe want to test ...
+
+## Deployed resources ##
 * Domain Controller: AD Roles installed & configured, AD CS installed & configured
 * AD FS: Domain Joined, Role installed, Certificate issued
 * File-Server: Domain Joined, Role installed
 * Client: Domain Joined
 
-Parameters:
+## Parameters ##
 * Username for all VMs (default: vmadmin)
-* Password for 
+* Password for all VMs
+* DNS Labels for all VMs
+* Domain Name
+
+
 
 
 
