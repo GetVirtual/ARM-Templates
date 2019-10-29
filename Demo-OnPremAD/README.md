@@ -29,7 +29,7 @@ Don´t use this with sensitive data or in a production environment.
 ## Parameters ##
 * Username for all VMs (default: vmadmin)
 * Password for all VMs
-* DNS Names for all VMs (only important for your RDP connection, computernames are "static" as variables)
+* DNS Names for all VMs - must be Unique! (only important for your RDP connection, computernames are "static" as variables)
 * Domain Name for your local AD Doamin
 
 ![arm](https://raw.githubusercontent.com/GetVirtual/Azure-ARM/master/Demo-OnPremAD/arm.png "ARM")
