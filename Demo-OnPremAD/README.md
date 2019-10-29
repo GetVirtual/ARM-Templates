@@ -13,10 +13,15 @@ Examples for test scenarios:
 * Azure File Sync (https://docs.microsoft.com/en-us/azure/storage/files/storage-files-introduction)
 * and many more hybrid scenarios you maybe want to test ...
 
+WARNING:
+This is a deployment for testing & learning scenarios with PublicIPs (+NSG) attached in order to establish a quick connection.
+Don´t use this with sensitive data or in a production environment.
+
+
 ## Deployed resources ##
 * Domain Controller: AD Roles installed & configured, AD CS installed & configured
-* AD FS: Domain Joined, Role installed, Certificate issued
-* File-Server: Domain Joined, Role installed
+* AD FS: Domain Joined, AD FS Role installed, Certificate issued
+* File-Server: Domain Joined
 * Client: Domain Joined
 
 ## Parameters ##

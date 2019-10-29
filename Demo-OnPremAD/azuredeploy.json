@@ -59,6 +59,8 @@
         "vnetSubnetName": "subnet1",
         "vnetSubnetPrefix": "10.10.0.0/24",
 
+        "nsgname": "nsg",
+
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
         "WindowsOSVersion": "2019-Datacenter",
@@ -118,11 +120,50 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-09-01",
+            "name": "[variables('nsgname')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "RDP",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+
+                        }
+                    },
+                    {
+                        "name": "ICMP",
+                        "properties": {
+                            "protocol": "ICMP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound"
+
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "vnet",
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
             "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
             ],
             "tags": {
                 "displayName": "vnet"
@@ -143,7 +184,10 @@
                     {
                         "name": "[variables('vnetSubnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('vnetSubnetPrefix')]"
+                            "addressPrefix": "[variables('vnetSubnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
+                            }
                         }
                     }
                 ]
@@ -341,7 +385,7 @@
             "apiVersion": "2017-03-30",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]"
-                
+
             ],
             "tags": {
                 "displayName": "vmFS"
