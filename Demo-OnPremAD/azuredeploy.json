@@ -16,28 +16,28 @@
                 "description": "Password for all machines (and AD Restore)"
             }
         },
-        "DNSLabelDC": {
+        "DNSNameDC": {
             "type": "string",
             "minLength": 1,
             "metadata": {
                 "description": "Unique DNS Label for the Domain Controller"
             }
         },
-        "DNSLabelFS": {
+        "DNSNameADFS": {
             "type": "string",
             "minLength": 1,
             "metadata": {
                 "description": "Unique DNS Label for the ADFS Server"
             }
         },
-        "DNSLabelFile": {
+        "DNSNameFile": {
             "type": "string",
             "minLength": 1,
             "metadata": {
                 "description": "Unique DNS Label for the File Server"
             }
         },
-        "DNSLabelClient": {
+        "DNSNameClient": {
             "type": "string",
             "minLength": 1,
             "metadata": {
@@ -201,7 +201,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabelDC')]"
+                    "domainNameLabel": "[parameters('dnsNameDC')]"
                 }
             },
             "tags": {
@@ -339,7 +339,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabelFS')]"
+                    "domainNameLabel": "[parameters('dnsNameADFS')]"
                 }
             },
             "tags": {
@@ -479,7 +479,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabelFile')]"
+                    "domainNameLabel": "[parameters('dnsNameFile')]"
                 }
             },
             "tags": {
@@ -611,7 +611,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabelClient')]"
+                    "domainNameLabel": "[parameters('dnsNameClient')]"
                 }
             },
             "tags": {
