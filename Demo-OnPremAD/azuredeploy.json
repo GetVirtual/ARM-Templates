@@ -2,7 +2,7 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "AdminUserName": {
+        "AdminUsername": {
             "type": "string",
             "minLength": 1,
             "defaultValue": "vmadmin",
@@ -13,7 +13,7 @@
         "AdminPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "Same Password for everything - don´t do this at home! ;-)"
+                "description": "Password for all machines (and AD Restore)"
             }
         },
         "DNSLabelDC": {
