@@ -17,30 +17,45 @@
                 "description": "Same Password for everything - don´t do this at home! ;-)"
             }
         },
-        "dnsLabelDC": {
+        "DNSLabelDC": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremdcarm"
+            "defaultValue": "onpremdcarm",
+            "metadata": {
+                "description": "Unique DNS Label for the Domain Controller"
+            }
         },
-        "dnsLabelFS": {
+        "DNSLabelFS": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremfsarm"
+            "defaultValue": "onpremfsarm",
+            "metadata": {
+                "description": "Unique DNS Label for the ADFS Server"
+            }
         },
-        "dnsLabelFile": {
+        "DNSLabelFile": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremfilearm"
+            "defaultValue": "onpremfilearm",
+            "metadata": {
+                "description": "Unique DNS Label for the File Server"
+            }
         },
-        "dnsLabelClient": {
+        "DNSLabelClient": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremclientarm"
+            "defaultValue": "onpremclientarm",
+            "metadata": {
+                "description": "Unique DNS Label for the Client"
+            }
         },
-        "domainname": {
+        "DomainName": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "jrlobenz.rocks"
+            "defaultValue": "jrlobenz.rocks",
+            "metadata": {
+                "description": "Your AD Domain"
+            }
         }
 
     },
@@ -52,7 +67,7 @@
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
         "WindowsOSVersion": "2019-Datacenter",
-            
+
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
         "vmDCstaticprivip": "10.10.0.4",
@@ -330,8 +345,8 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2017-03-30",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmFSNicName'))]"
+                
             ],
             "tags": {
                 "displayName": "vmFS"
@@ -395,7 +410,7 @@
                         "domainname": "[parameters('domainname')]",
                         "nodename": "[variables('vmFSName')]",
                         "CARootName": "[variables('vmDCName')]",
-                        "CAServerFQDN" : "[concat(variables('vmDCName'), '.', parameters('domainname'))]"
+                        "CAServerFQDN": "[concat(variables('vmDCName'), '.', parameters('domainname'))]"
                     }
                 },
                 "protectedSettings": {

@@ -5,12 +5,18 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-### TODO ###
 
-* Reboot?
-* FS Services konfigurieren
+## Description ##
 
+The ARM Template deploys
+* Domain Controller: AD Roles installed & configured, AD CS installed & configured
+* AD FS: Domain Joined, Role installed, Certificate issued
+* File-Server: Domain Joined, Role installed
+* Client: Domain Joined
 
+Parameters:
+* Username for all VMs (default: vmadmin)
+* Password for 
 
 
 
