@@ -12,7 +12,6 @@
         },
         "AdminPassword": {
             "type": "securestring",
-            "defaultValue": "$ecurity#123",
             "metadata": {
                 "description": "Same Password for everything - don´t do this at home! ;-)"
             }
@@ -20,7 +19,6 @@
         "DNSLabelDC": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremdcarm",
             "metadata": {
                 "description": "Unique DNS Label for the Domain Controller"
             }
@@ -28,7 +26,6 @@
         "DNSLabelFS": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremfsarm",
             "metadata": {
                 "description": "Unique DNS Label for the ADFS Server"
             }
@@ -36,7 +33,6 @@
         "DNSLabelFile": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremfilearm",
             "metadata": {
                 "description": "Unique DNS Label for the File Server"
             }
@@ -44,7 +40,6 @@
         "DNSLabelClient": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "onpremclientarm",
             "metadata": {
                 "description": "Unique DNS Label for the Client"
             }
