@@ -5,6 +5,7 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+![arm](https://raw.githubusercontent.com/GetVirtual/Azure-ARM/master/Demo-OnPremAD/arm.png "ARM")
 
 ### Description ###
 
