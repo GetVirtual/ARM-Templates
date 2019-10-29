@@ -74,8 +74,8 @@
         "vmDCSubnetRef": "[concat(variables('vmDCVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmDCNicName": "[concat(variables('vmDCName'), 'NetworkInterface')]",
 
-        "vmFSName": "OnPrem-FS",
-        "vmFSpipname": "OnPrem-FS-pip",
+        "vmFSName": "OnPrem-ADFS",
+        "vmFSpipname": "OnPrem-ADFS-pip",
         "vmFSstaticprivip": "10.10.0.5",
         "vmFSVmSize": "Standard_B4ms",
         "vmFSosdisktype": "Premium_LRS",
