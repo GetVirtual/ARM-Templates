@@ -5,8 +5,6 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-![arm](https://raw.githubusercontent.com/GetVirtual/Azure-ARM/master/Demo-OnPremAD/arm.png "ARM")
-
 ### Description ###
 
 ARM Template to simulate "On Premises services" with preconfigured DC and prepared servers for AD FS, Fileserver, etc.
@@ -27,6 +25,7 @@ Examples for test scenarios:
 * DNS Labels for all VMs
 * Domain Name
 
+![arm](https://raw.githubusercontent.com/GetVirtual/Azure-ARM/master/Demo-OnPremAD/arm.png "ARM")
 
 
 
