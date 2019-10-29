@@ -9,8 +9,10 @@
 
 ARM Template to simulate "On Premises services" with preconfigured DC and prepared servers for AD FS, Fileserver, etc.
 Examples for test scenarios:
-* AD Connect (Sync AD and AAD)
+* AD Connect (Sync AD and AAD: Password Hash Sync, Passthrough Auth, ADFS)
 * Azure File Sync (https://docs.microsoft.com/en-us/azure/storage/files/storage-files-introduction)
+* Storage Migration Service (https://docs.microsoft.com/en-us/windows-server/storage/storage-migration-service/overview)
+* Domain Replication (OnPrem <> Azure)
 * and many more hybrid scenarios you maybe want to test ...
 
 WARNING:
@@ -27,7 +29,7 @@ Don´t use this with sensitive data or in a production environment.
 ## Parameters ##
 * Username for all VMs (default: vmadmin)
 * Password for all VMs
-* DNS Labels for all VMs
+* DNS Names for all VMs
 * Domain Name
 
 ![arm](https://raw.githubusercontent.com/GetVirtual/Azure-ARM/master/Demo-OnPremAD/arm.png "ARM")
