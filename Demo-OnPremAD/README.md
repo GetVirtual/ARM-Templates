@@ -5,6 +5,9 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+
+[![Open in Visual Studio Online](https://img.shields.io/endpoint?style=social&url=https%3A%2F%2Faka.ms%2Fvso-badge)](https://online.visualstudio.com/environments/new?name=AzureARM%20OnPremAD&repo=GetVirtual/Azure-ARM)
+
 ### Description ###
 
 ARM Template to simulate "On Premises services" with preconfigured DC and prepared servers for AD FS, Fileserver, etc.
