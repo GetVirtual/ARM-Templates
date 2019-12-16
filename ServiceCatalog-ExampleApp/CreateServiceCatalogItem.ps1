@@ -1,6 +1,6 @@
 param (
-    [Parameter(Mandatory = $true)][string]$UPN, 
-    [Parameter(Mandatory = $true)][string]$storageaccountname
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the User Principal Name that gets permission to manage the app")][string]$UPN, 
+    [Parameter(Mandatory = $true, HelpMessage = "Enter the name of the storage account that will be created for storing the zipped templates")][string]$storageaccountname
 )
 
 # Register Azure Solutions if necessary
@@ -34,5 +34,5 @@ $blob = Get-AzStorageBlob -Container appcontainer -Blob $filename -Context $ctx
 
 # Create Service Catalog Managed Application Definition
 New-AzManagedApplicationDefinition -Name "ManagedStorage" -Location $location -ResourceGroupName $rg -LockLevel ReadOnly `
-  -DisplayName "Managed Storage Account" -Description "Managed Azure Storage Account" -Authorization "${userID}:$ownerID" -PackageFileUri $blob.ICloudBlob.StorageUri.PrimaryUri.AbsoluteUri
+  -DisplayName "Managed Storage Account" -Description "Managed Storage Account" -Authorization "${userID}:$ownerID" -PackageFileUri $blob.ICloudBlob.StorageUri.PrimaryUri.AbsoluteUri
 
