@@ -65,7 +65,7 @@ Configuration FS {
         CertReq SSLCert {
             CARootName          = $CARootName
             CAServerFQDN        = $CAServerFQDN
-            
+            Subject             = "CN=Onprem-ADFS.jrlobenz.rocks"
             KeyLength           = '2048'
             Exportable          = $true
             ProviderName        = "Microsoft RSA SChannel Cryptographic Provider"
@@ -78,8 +78,6 @@ Configuration FS {
             KeyType             = 'RSA'
             RequestType         = 'CMC'
             DependsOn           = "[WaitForCertificateServices]RootCA"
-            
-            Subject             = "CN=Onprem-FS.jrlobenz.rocks"
             CAType = "Enterprise"
             UseMachineContext = $true
         }

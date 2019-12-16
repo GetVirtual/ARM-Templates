@@ -1,0 +1,38 @@
+param (
+    [Parameter(Mandatory = $true)][string]$UPN, 
+    [Parameter(Mandatory = $true)][string]$storageaccountname
+)
+
+# Register Azure Solutions if necessary
+# Register-AzResourceProvider -ProviderNamespace Microsoft.Solutions
+
+# Variables
+$rg = "servicecatalog"
+$filename = "sc_storageaccount.zip"
+$location = "westeurope"
+
+# Create / Update ZIP File
+Compress-Archive -Path .\*.json -Update -DestinationPath .\sc_storageaccount.zip
+
+# Create RG
+New-AzResourceGroup -Name $rg -Location $location 
+
+# Create Storage Account and Container
+$storageAccount = New-AzStorageAccount -ResourceGroupName $rg -Name $storageaccountname -Location $location -SkuName Standard_LRS -Kind Storage
+$ctx = $storageAccount.Context
+New-AzStorageContainer -Name appcontainer -Context $ctx -Permission blob
+
+# Uploade Service Catalog Item 
+Set-AzStorageBlobContent -File $filename -Container appcontainer -Blob $filename -Context $ctx 
+
+# Get ID for your User and the Role ID for "Owner"
+$userID=(get-azaduser -UserPrincipalName $UPN).Id
+$ownerID=(Get-AzRoleDefinition -Name Owner).Id
+
+# Reference Blob
+$blob = Get-AzStorageBlob -Container appcontainer -Blob $filename -Context $ctx
+
+# Create Service Catalog Managed Application Definition
+New-AzManagedApplicationDefinition -Name "ManagedStorage" -Location $location -ResourceGroupName $rg -LockLevel ReadOnly `
+  -DisplayName "Managed Storage Account" -Description "Managed Azure Storage Account" -Authorization "${userID}:$ownerID" -PackageFileUri $blob.ICloudBlob.StorageUri.PrimaryUri.AbsoluteUri
+

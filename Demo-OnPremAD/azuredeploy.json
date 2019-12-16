@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "AdminUsername": {
@@ -58,6 +58,11 @@
         "vnetPrefix": "10.10.0.0/16",
         "vnetSubnetName": "subnet1",
         "vnetSubnetPrefix": "10.10.0.0/24",
+        "vnetBastionSubnetName": "AzureBastionSubnet",
+        "vnetBastionSubnetPrefix": "10.10.1.0/24",
+
+        "BastionHostPublicIPName": "BastionHostPublicIP",
+        "BastionHostName": "BastionHost",
 
         "nsgname": "nsg",
 
@@ -187,6 +192,51 @@
                             "addressPrefix": "[variables('vnetSubnetPrefix')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnetBastionSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnetBastionSubnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "name": "[variables('BastionHostPublicIPName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            },
+            "tags": {
+            }
+        },
+        {
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/bastionHosts",
+            "name": "[variables('BastionHostName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('BastionHostPublicIPName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "bastionipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet',variables('vnetBastionSubnetName'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('BastionHostPublicIPName'))]"
                             }
                         }
                     }
