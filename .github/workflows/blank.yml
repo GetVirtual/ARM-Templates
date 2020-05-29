@@ -3,13 +3,13 @@ name: Azure Login sample workflow
 on: [push]
 
 jobs:
-test-azure-login:
-runs-on: ubuntu-latest
-steps:
+  test-azure-login:
+    runs-on: ubuntu-latest
 
+steps:
 - uses: azure/login@v1
-with:
-creds: ${{ secrets.AZURE_CREDENTIALS }}
+  with:
+  creds: ${{ secrets.AZURE_CREDS }}
 
 - run: |
 az account show
