@@ -47,11 +47,13 @@
             "name": "[variables('migrateprojectname')]",
             "location": "westeurope",
             "tags": {
-                "Migrate Project": "[variables('migrateprojectname')]"
+                "Migrate Project": "[variables('migrateprojectname')]",
+                "displayName": "Azure Migrate Project"
 
             },
             "properties": {
-                "registeredTools": []
+                "registeredTools": [
+                ]
             }
         },
         {
@@ -68,6 +70,9 @@
                 "status": "Active",
                 "cleanupState": "None"
 
+            },
+            "tags": {
+                "displayName": "Azure Migrate Project Assessment"
             }
         },
         {
@@ -84,7 +89,11 @@
                 "status": "Inactive",
                 "cleanupState": "None"
 
+            },
+            "tags": {
+                "displayName": "Azure Migrate Project Discovery"
             }
+
         },
         {
             "type": "Microsoft.Migrate/MigrateProjects/Solutions",
@@ -99,7 +108,11 @@
                 "goal": "Servers",
                 "status": "Active",
                 "cleanupState": "None"
+            },
+            "tags": {
+                "displayName": "Azure Migrate Project Migration"
             }
+
         },
         {
             "name": "vnet",
@@ -238,7 +251,12 @@
                         "url": "[variables('DSCurl')]",
                         "script": "[variables('DSCfilename')]",
                         "function": "[variables('DSCfunction')]"
-                    }
+                    },
+                    "ModulesUrl": "",
+                    "configurationFunction": ""
+
+                },
+                "protectedSettings": {
                 }
             },
             "tags": {
