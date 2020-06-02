@@ -51,9 +51,7 @@
 
             },
             "properties": {
-                "registeredTools": [
-                ],
-                "provisioningState": "Succeeded"
+                "registeredTools": []
             }
         },
         {
