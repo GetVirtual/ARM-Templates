@@ -20,7 +20,7 @@
             "minLength": 1,
             "defaultValue": "onpremjlo"
         }
-        
+
     },
     "variables": {
         "vnetPrefix": "10.10.0.0/16",
@@ -48,9 +48,11 @@
             "location": "westeurope",
             "tags": {
                 "Migrate Project": "[variables('migrateprojectname')]"
+
             },
             "properties": {
-                "registeredTools": [],
+                "registeredTools": [
+                ],
                 "provisioningState": "Succeeded"
             }
         },
@@ -106,7 +108,8 @@
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
-            "dependsOn": [],
+            "dependsOn": [
+            ],
             "tags": {
                 "displayName": "vnet"
             },
@@ -141,7 +144,7 @@
                 "displayName": "vm1pip"
             }
         },
-        
+
         {
             "name": "[variables('vm1NicName')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -171,7 +174,7 @@
                 ]
             }
         },
-        
+
         {
             "name": "[variables('vm1Name')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -225,12 +228,12 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]"
-                
+
             ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
                 "type": "DSC",
-                "typeHandlerVersion": "2.76",
+                "typeHandlerVersion": "2.80",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "configuration": {
@@ -244,9 +247,9 @@
                 "displayName": "vm1extdsc"
             }
         }
-        
-        
-        
+
+
+
     ],
     "outputs": {
     }
