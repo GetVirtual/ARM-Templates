@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "AdminUserName": {
@@ -37,9 +37,70 @@
         "vm1NicName": "[concat(variables('vm1Name'), 'NetworkInterface')]",
         "DSCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/DSC/HyperV.zip",
         "DSCfilename": "HyperV.ps1",
-        "DSCfunction": "HyperV"
+        "DSCfunction": "HyperV",
+        "migrateprojectname": "AzureMigrateDemo"
     },
     "resources": [
+        {
+            "type": "Microsoft.Migrate/MigrateProjects",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[variables('migrateprojectname')]",
+            "location": "westeurope",
+            "tags": {
+                "Migrate Project": "[variables('migrateprojectname')]"
+            },
+            "properties": {
+                "registeredTools": [],
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Migrate/MigrateProjects/Solutions",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Assessment-ServerAssessment')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+            ],
+            "properties": {
+                "tool": "ServerAssessment",
+                "purpose": "Assessment",
+                "goal": "Servers",
+                "status": "Active",
+                "cleanupState": "None"
+
+            }
+        },
+        {
+            "type": "Microsoft.Migrate/MigrateProjects/Solutions",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Discovery-ServerDiscovery')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+            ],
+            "properties": {
+                "tool": "ServerDiscovery",
+                "purpose": "Discovery",
+                "goal": "Servers",
+                "status": "Inactive",
+                "cleanupState": "None"
+
+            }
+        },
+        {
+            "type": "Microsoft.Migrate/MigrateProjects/Solutions",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Migration-ServerMigration')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+            ],
+            "properties": {
+                "tool": "ServerMigration",
+                "purpose": "Migration",
+                "goal": "Servers",
+                "status": "Active",
+                "cleanupState": "None"
+            }
+        },
         {
             "name": "vnet",
             "type": "Microsoft.Network/virtualNetworks",
