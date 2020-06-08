@@ -45,7 +45,7 @@
             "type": "Microsoft.Migrate/MigrateProjects",
             "apiVersion": "2018-09-01-preview",
             "name": "[variables('migrateprojectname')]",
-            "location": "westeurope",
+            "location": "West Europe",
             "tags": {
                 "Migrate Project": "[variables('migrateprojectname')]",
                 "displayName": "Azure Migrate Project"
@@ -120,6 +120,7 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
             "dependsOn": [
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
             ],
             "tags": {
                 "displayName": "vnet"
@@ -251,9 +252,8 @@
                         "url": "[variables('DSCurl')]",
                         "script": "[variables('DSCfilename')]",
                         "function": "[variables('DSCfunction')]"
-                    },
-                    "ModulesUrl": "",
-                    "configurationFunction": ""
+                    }
+
 
                 },
                 "protectedSettings": {
