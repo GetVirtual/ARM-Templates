@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "AdminUserName": {
@@ -20,15 +20,18 @@
         },
         "VMSize": {
             "type": "string",
-            "defaultValue": "Standard_D2_v2",
+            "defaultValue": "Standard_B4ms",
             "allowedValues": [
-                "Standard_D2_v2",
-                "Standard_D2_v2"
+                "Standard_B4ms",
+                "Standard_B8ms",
+                "Standard_D4s_v3",
+                "Standard_D8s_v3"
             ]
         },
         "VMCount": {
             "type": "int",
-            "minValue": 1
+            "minValue": 1,
+            "defaultValue": 1
         }
     },
     "variables": {
