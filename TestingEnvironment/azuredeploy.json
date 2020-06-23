@@ -30,8 +30,8 @@
         },
         "VMCount": {
             "type": "int",
-            "minValue": 1,
-            "defaultValue": 1
+            "minValue": 1
+            
         }
     },
     "variables": {
@@ -71,12 +71,30 @@
             }
         },
         {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat(variables('vmName'), copyIndex(1), '-pip')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+
+            },
+            "tags": {
+                "displayName": "[concat(variables('vmName'), copyIndex(1), '-pip')]"
+            },
+            "copy": {
+                "name": "pipcopy",
+                "count": "[parameters('VMcount')]"
+            }
+        },
+        {
             "name": "[concat(variables('vmName'), copyIndex(1), '-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), copyIndex(1), '-pip'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -86,6 +104,9 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[variables('SubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), copyIndex(1), '-pip'))]"
                             }
                         }
                     }
@@ -96,6 +117,7 @@
                 "count": "[parameters('VMcount')]"
             }
         },
+        
         {
             "name": "[concat(variables('VMName'), copyIndex(1))]",
             "type": "Microsoft.Compute/virtualMachines",
