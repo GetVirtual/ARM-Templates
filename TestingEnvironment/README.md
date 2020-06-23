@@ -5,3 +5,10 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
      
+## ARM Template for deployment of testing vms
+
+### Specs
+* Windows Server 2016/2019
+* a few common VM Sizes for general purpose testing (B-Series, D-Series)
+* deploy multiple VMs
+* all will be placed into a newly created VNET
