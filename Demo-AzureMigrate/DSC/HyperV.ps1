@@ -90,7 +90,10 @@ Configuration HyperV {
                 Add-Type -assembly "system.io.compression.filesystem"
                 $URL = "https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrateAppliance.zip"
                 $DLFile = "D:\AzureMigrateAppliance.zip"
-                Invoke-WebRequest $URL -OutFile $DLFile
+                
+                $wc = New-Object System.Net.WebClient
+                $wc.DownloadFile($URL, $DLFile)
+
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
                 Import-VM -Path 'C:\VirtualMachines\AzureMigrateAppliance\Virtual Machines\53FF67B5-C68F-4099-BAF7-91FECDD524BD.XML'
                 Start-VM -Name AzureMigrateAppliance
@@ -98,7 +101,10 @@ Configuration HyperV {
                 # Download & Start MigrationVM
                 $URL = "https://azuremigratedemo.blob.core.windows.net/vms/MigrationVM.zip"
                 $DLFile = "D:\MigrationVM.zip"
-                Invoke-WebRequest $URL -OutFile $DLFile
+                
+                $wc = New-Object System.Net.WebClient
+                $wc.DownloadFile($URL, $DLFile)
+
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
                 Import-VM -Path 'C:\VirtualMachines\MigrationVM\Virtual Machines\C50E94CD-0B7E-41AE-957C-3A3846E28751.vmcx'
                 Start-VM -Name MigrationVM
