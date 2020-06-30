@@ -22,7 +22,7 @@ Don´t use this with sensitive data or in a production environment.
 
 ## Deployed resources ##
 * Domain Controller: AD Roles installed & configured, AD CS installed & configured
-* AD FS: Domain Joined, AD FS Role installed, Certificate issued
+* AD FS: Domain Joined, AD FS Role installed, (deactivated Certificate creation as it caused problems, request per Cert GUI is working fine)
 * File-Server: Domain Joined
 * Client: Domain Joined
 
