@@ -86,13 +86,18 @@ Configuration HyperV {
                 # Disable Windows Firewall
                 Set-NetFirewallProfile -All -Enabled False -Verbose
 
-                # Download & Start Azure Migrate Appliance
+                # Download azcopy binaries
                 Add-Type -assembly "system.io.compression.filesystem"
+                Invoke-WebRequest -uri "https://aka.ms/downloadazcopy-v10-windows" -OutFile "D:\azcopy.zip"
+                [io.compression.zipfile]::ExtractToDirectory("D:\azcopy.zip", "D:\")
+                $path =get-childitem -Path "D:\" -Recurse -Include "azcopy.exe"
+                Copy-Item $path "D:\"
+
+                # Download & Start Azure Migrate Appliance
+                
                 $URL = "https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrateAppliance.zip"
                 $DLFile = "D:\AzureMigrateAppliance.zip"
-                
-                $wc = New-Object System.Net.WebClient
-                $wc.DownloadFile($URL, $DLFile)
+                D:\azcopy.exe cp $URL $DLFile
 
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
                 Import-VM -Path 'C:\VirtualMachines\AzureMigrateAppliance\Virtual Machines\53FF67B5-C68F-4099-BAF7-91FECDD524BD.XML'
@@ -102,9 +107,8 @@ Configuration HyperV {
                 $URL = "https://azuremigratedemo.blob.core.windows.net/vms/MigrationVM.zip"
                 $DLFile = "D:\MigrationVM.zip"
                 
-                $wc = New-Object System.Net.WebClient
-                $wc.DownloadFile($URL, $DLFile)
-
+                D:\azcopy.exe cp $URL $DLFile
+                
                 [io.compression.zipfile]::ExtractToDirectory($DLFile, "C:\VirtualMachines")
                 Import-VM -Path 'C:\VirtualMachines\MigrationVM\Virtual Machines\C50E94CD-0B7E-41AE-957C-3A3846E28751.vmcx'
                 Start-VM -Name MigrationVM
