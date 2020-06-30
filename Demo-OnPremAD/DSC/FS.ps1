@@ -17,7 +17,7 @@ Configuration FS {
     )  
 
     Import-DscResource -ModuleName xActiveDirectory   
-    Import-DscResource -ModuleName CertificateDsc    
+    Import-DscResource -ModuleName CertificateDsc  
     Import-DscResource -ModuleName ComputerManagementDsc
 
     Node 'localhost' {
@@ -62,25 +62,7 @@ Configuration FS {
             DependsOn = "[PendingReboot]RebootAfterDomainJoin"
         }
 
-        CertReq SSLCert {
-            CARootName          = $CARootName
-            CAServerFQDN        = $CAServerFQDN
-            Subject             = "CN=Onprem-ADFS.jrlobenz.rocks"
-            KeyLength           = '2048'
-            Exportable          = $true
-            ProviderName        = "Microsoft RSA SChannel Cryptographic Provider"
-            OID                 = '1.3.6.1.5.5.7.3.1'
-            KeyUsage            = '0xa0'
-            CertificateTemplate = 'Machine'
-            AutoRenew           = $true
-            FriendlyName        = 'SSL Cert for ADFS'
-            Credential          = $domainCred
-            KeyType             = 'RSA'
-            RequestType         = 'CMC'
-            DependsOn           = "[WaitForCertificateServices]RootCA"
-            CAType = "Enterprise"
-            UseMachineContext = $true
-        }
+
 
 
 
