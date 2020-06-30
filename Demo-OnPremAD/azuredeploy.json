@@ -47,7 +47,6 @@
         "DomainName": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "jrlobenz.rocks",
             "metadata": {
                 "description": "Your AD Domain"
             }
