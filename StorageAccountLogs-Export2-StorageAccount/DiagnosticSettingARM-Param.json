@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+        "settingName": {
+            "value": "Send2LA"
+        },
+        "storageAccountName": {
+            "value": "sbuseast"
+        },
+        "storageSinkName": {
+            "value": "logs2sbuseast"
+        },
+        "workspaceId": {
+            "value": "/subscriptions/70dc5ff3-7288-42e3-a61d-174b85ddea10/resourcegroups/MyTestRP/providers/microsoft.operationalinsights/workspaces/sbLogAnalyticsEastUS"
+        }
+    }
+}
