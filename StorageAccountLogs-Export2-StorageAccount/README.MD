@@ -7,7 +7,10 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+
+
 **Attention - the export logs feature is currently in preview and you can´t deploy it without being whitelisted**
+
 
 ## ARM Template ##
 - Creates source storage account
