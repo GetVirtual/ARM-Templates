@@ -45,6 +45,9 @@
         "vnetSubnetPrefix": "10.20.100.0/24",
         "vnetSubnetNameANF": "subnetanf",
         "vnetSubnetANFPrefix": "10.20.101.0/24",
+        
+        "vmDCstaticprivip": "10.20.100.4",
+        "vmClientstaticprivip": "10.20.100.5",
 
         "nsgname": "nsg",
 
@@ -58,7 +61,6 @@
 
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
-        "vmDCstaticprivip": "10.20.100.4",
         "vmDCVmSize": "Standard_B4ms",
         "vmDCosdisktype": "Premium_LRS",
         "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -67,7 +69,6 @@
 
         "vmClientName": "OnPrem-Client",
         "vmClientpipname": "OnPrem-Client-pip",
-        "vmClientstaticprivip": "10.20.100.5",
         "vmClientVmSize": "Standard_B4ms",
         "vmClientosdisktype": "Premium_LRS",
         "vmClientVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -408,6 +409,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('vmClientName'))]"
+                
 
             ],
             "properties": {
@@ -446,7 +448,8 @@
             "name": "[variables('ANF-Accountname')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'), '/extensions/Microsoft.Powershell.DSC')]"
 
             ],
             "properties": {
