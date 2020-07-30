@@ -40,13 +40,17 @@
 
     },
     "variables": {
-        "vnetPrefix": "10.0.100.0/23",
+        "vnetPrefix": "10.20.0.0/16",
         "vnetSubnetName": "subnetclients",
-        "vnetSubnetPrefix": "10.0.100.0/24",
+        "vnetSubnetPrefix": "10.20.100.0/24",
         "vnetSubnetNameANF": "subnetanf",
-        "vnetSubnetANFPrefix": "10.0.101.0/24",
+        "vnetSubnetANFPrefix": "10.20.101.0/24",
 
         "nsgname": "nsg",
+
+        "ANF-Accountname": "ANF-Account",
+        "ANF-Poolname": "ANF-Pool",
+        "ANF-Prefix": "ANFSMB",
 
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
@@ -54,7 +58,7 @@
 
         "vmDCName": "OnPrem-DC",
         "vmDCpipname": "OnPrem-DC-pip",
-        "vmDCstaticprivip": "10.100.0.4",
+        "vmDCstaticprivip": "10.20.100.4",
         "vmDCVmSize": "Standard_B4ms",
         "vmDCosdisktype": "Premium_LRS",
         "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -63,18 +67,18 @@
 
         "vmClientName": "OnPrem-Client",
         "vmClientpipname": "OnPrem-Client-pip",
-        "vmClientstaticprivip": "10.100.0.5",
+        "vmClientstaticprivip": "10.20.100.5",
         "vmClientVmSize": "Standard_B4ms",
         "vmClientosdisktype": "Premium_LRS",
         "vmClientVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
         "vmClientSubnetRef": "[concat(variables('vmClientVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmClientNicName": "[concat(variables('vmClientName'), 'NetworkInterface')]",
 
-        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/DC.zip",
+        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/DC.zip",
         "DSCDCfilename": "DC.ps1",
         "DSCDCfunction": "DC",
 
-        "DSCClienturl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-OnPremAD/DSC/Client.zip",
+        "DSCClienturl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/Client.zip",
         "DSCClientname": "Client.ps1",
         "DSCClientfunction": "Client"
 
@@ -154,7 +158,14 @@
                     {
                         "name": "[variables('vnetSubnetNameANF')]",
                         "properties": {
-                            "addressPrefix": "[variables('vnetSubnetANFPrefix')]"
+                            "addressPrefix": "[variables('vnetSubnetANFPrefix')]",
+                            "delegations": [
+                                {
+                                    "properties": {
+                                        "serviceName": "Microsoft.Netapp/volumes"
+                                    }
+                                }
+                            ]
                         }
                     }
                 ]
@@ -206,7 +217,6 @@
                 ]
             }
         },
-
         {
             "name": "[variables('vmDCName')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -428,6 +438,41 @@
             },
             "tags": {
                 "displayName": "vmClientextdsc"
+            }
+        },
+        {
+            "type": "Microsoft.NetApp/netAppAccounts",
+            "apiVersion": "2019-11-01",
+            "name": "[variables('ANF-Accountname')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
+
+            ],
+            "properties": {
+                "activeDirectories": [
+                    {
+                        "username": "[parameters('AdminUsername')]",
+                        "password": "[parameters('AdminPassword')]",
+                        "domain": "[parameters('DomainName')]",
+                        "dns": "[variables('vmDCstaticprivip')]",
+                        "smbServerName": "[variables('ANF-Prefix')]",
+                        "organizationalUnit": "CN=Computers"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.NetApp/netAppAccounts/capacityPools",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(variables('ANF-Accountname'), variables('ANF-Poolname'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.NetApp/netAppAccounts', variables('ANF-Accountname'))]"
+            ],
+            "properties": {
+                "serviceLevel": "Standard",
+                "size": 4398046511104
             }
         }
 
