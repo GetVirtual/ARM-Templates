@@ -41,19 +41,26 @@
     },
     "variables": {
         "vnetPrefix": "10.20.0.0/16",
-        "vnetSubnetName": "subnetclients",
-        "vnetSubnetPrefix": "10.20.100.0/24",
-        "vnetSubnetNameANF": "subnetanf",
-        "vnetSubnetANFPrefix": "10.20.101.0/24",
-        
-        "vmDCstaticprivip": "10.20.100.4",
-        "vmClientstaticprivip": "10.20.100.5",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
 
-        "nsgname": "nsg",
+        "vnetSubnetClientsPrefix": "10.20.0.0/24",
+        "vnetSubnetANFPrefix": "10.20.1.0/24",
 
-        "ANF-Accountname": "ANF-Account",
-        "ANF-Poolname": "ANF-Pool",
-        "ANF-Prefix": "ANFSMB",
+        "vnetSubnetClientsName": "subnetclients",
+        "vnetSubnetANFName": "subnetanf",
+
+        "vnetSubnetClientsRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetClientsName'))]",
+        "vnetSubnetANFRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetANFName'))]",
+  
+        "vmDCstaticprivip": "10.20.0.4",
+        "vmClientstaticprivip": "10.20.0.5",
+
+        "ANFAccountname": "ANFAccount",
+        "ANFPoolname": "ANFPool",
+        "ANFVolumeName": "ANFVolume",
+        "ANFPrefix": "ANFSMB",
+        "ANFPoolsize": 4398046511104,
+        "ANFVolumesize": 107374182400,
 
         "vmImagePublisher": "MicrosoftWindowsServer",
         "vmImageOffer": "WindowsServer",
@@ -63,16 +70,12 @@
         "vmDCpipname": "OnPrem-DC-pip",
         "vmDCVmSize": "Standard_B4ms",
         "vmDCosdisktype": "Premium_LRS",
-        "vmDCVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-        "vmDCSubnetRef": "[concat(variables('vmDCVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmDCNicName": "[concat(variables('vmDCName'), 'NetworkInterface')]",
 
         "vmClientName": "OnPrem-Client",
         "vmClientpipname": "OnPrem-Client-pip",
         "vmClientVmSize": "Standard_B4ms",
         "vmClientosdisktype": "Premium_LRS",
-        "vmClientVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-        "vmClientSubnetRef": "[concat(variables('vmClientVnetID'), '/subnets/', variables('vnetSubnetName'))]",
         "vmClientNicName": "[concat(variables('vmClientName'), 'NetworkInterface')]",
 
         "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/DC.zip",
@@ -85,51 +88,14 @@
 
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-09-01",
-            "name": "[variables('nsgname')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "RDP",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "3389",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 100,
-                            "direction": "Inbound"
-
-                        }
-                    },
-                    {
-                        "name": "ICMP",
-                        "properties": {
-                            "protocol": "ICMP",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 110,
-                            "direction": "Inbound"
-
-                        }
-                    }
-                ]
-            }
-        },
+        
         {
             "name": "vnet",
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
+                
             ],
             "tags": {
                 "displayName": "vnet"
@@ -148,20 +114,19 @@
                 },
                 "subnets": [
                     {
-                        "name": "[variables('vnetSubnetName')]",
+                        "name": "[variables('vnetSubnetClientsName')]",
                         "properties": {
-                            "addressPrefix": "[variables('vnetSubnetPrefix')]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname'))]"
-                            }
+                            "addressPrefix": "[variables('vnetSubnetClientsPrefix')]"
+
                         }
                     },
                     {
-                        "name": "[variables('vnetSubnetNameANF')]",
+                        "name": "[variables('vnetSubnetANFName')]",
                         "properties": {
                             "addressPrefix": "[variables('vnetSubnetANFPrefix')]",
                             "delegations": [
                                 {
+                                    "name": "54b7fd98b87347e3855a5748025be27a",
                                     "properties": {
                                         "serviceName": "Microsoft.Netapp/volumes"
                                     }
@@ -208,7 +173,7 @@
                             "privateIPAddress": "[variables('vmDCstaticprivip')]",
                             "privateIPAllocationMethod": "Static",
                             "subnet": {
-                                "id": "[variables('vmDCSubnetRef')]"
+                                "id": "[variables('vnetSubnetClientsRef')]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmDCpipname'))]"
@@ -345,7 +310,7 @@
                             "privateIPAddress": "[variables('vmClientstaticprivip')]",
                             "privateIPAllocationMethod": "Static",
                             "subnet": {
-                                "id": "[variables('vmClientSubnetRef')]"
+                                "id": "[variables('vnetSubnetClientsRef')]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmClientpipname'))]"
@@ -409,7 +374,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('vmClientName'))]"
-                
+
 
             ],
             "properties": {
@@ -445,12 +410,10 @@
         {
             "type": "Microsoft.NetApp/netAppAccounts",
             "apiVersion": "2019-11-01",
-            "name": "[variables('ANF-Accountname')]",
+            "name": "[variables('ANFAccountname')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'), '/extensions/Microsoft.Powershell.DSC')]"
-
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmDCName'), 'Microsoft.Powershell.DSC')]"
             ],
             "properties": {
                 "activeDirectories": [
@@ -459,7 +422,7 @@
                         "password": "[parameters('AdminPassword')]",
                         "domain": "[parameters('DomainName')]",
                         "dns": "[variables('vmDCstaticprivip')]",
-                        "smbServerName": "[variables('ANF-Prefix')]",
+                        "smbServerName": "[variables('ANFPrefix')]",
                         "organizationalUnit": "CN=Computers"
                     }
                 ]
@@ -468,16 +431,37 @@
         {
             "type": "Microsoft.NetApp/netAppAccounts/capacityPools",
             "apiVersion": "2019-11-01",
-            "name": "[concat(variables('ANF-Accountname'), variables('ANF-Poolname'))]",
+            "name": "[concat(variables('ANFAccountname'), '/', variables('ANFPoolname'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.NetApp/netAppAccounts', variables('ANF-Accountname'))]"
+                "[resourceId('Microsoft.NetApp/netAppAccounts', variables('ANFAccountname'))]"
             ],
             "properties": {
                 "serviceLevel": "Standard",
-                "size": 4398046511104
+                "size": "[variables('ANFPoolsize')]"
+            }
+        },
+        {
+            "type": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
+            "apiVersion": "2019-11-01",
+            "name": "[concat(variables('ANFAccountname'), '/', variables('ANFPoolname'), '/', variables('ANFVolumeName'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('ANFAccountname'), variables('ANFPoolname'))]",
+                "[resourceId('Microsoft.NetApp/netAppAccounts', variables('ANFAccountname'))]"
+            ],
+            "properties": {
+                "serviceLevel": "Standard",
+                "creationToken": "vol",
+                "usageThreshold": "[variables('ANFVolumesize')]",
+                "protocolTypes": [
+                    "CIFS"
+                ],
+                "subnetId": "[variables('vnetSubnetANFRef')]"
+                
             }
         }
+
 
     ],
     "outputs": {
