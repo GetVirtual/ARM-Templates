@@ -51,13 +51,14 @@
 
         "vnetSubnetClientsRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetClientsName'))]",
         "vnetSubnetANFRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetANFName'))]",
-  
+
         "vmDCstaticprivip": "10.20.0.4",
         "vmClientstaticprivip": "10.20.0.5",
 
         "ANFAccountname": "ANFAccount",
         "ANFPoolname": "ANFPool",
-        "ANFVolumeName": "ANFVolume",
+        "ANFVolumeNameCIFS": "ANFCIFSVolume",
+        "ANFVolumeNameNFS": "ANFNFSVolume",
         "ANFPrefix": "ANFSMB",
         "ANFPoolsize": 4398046511104,
         "ANFVolumesize": 107374182400,
@@ -67,16 +68,16 @@
         "WindowsOSVersion": "2019-Datacenter",
 
         "vmDCName": "OnPrem-DC",
-        "vmDCpipname": "OnPrem-DC-pip",
+        "vmDCpipname": "[concat(variables('vmDCName'), '-pip')]",
         "vmDCVmSize": "Standard_B4ms",
         "vmDCosdisktype": "Premium_LRS",
-        "vmDCNicName": "[concat(variables('vmDCName'), 'NetworkInterface')]",
+        "vmDCNicName": "[concat(variables('vmDCName'), '-nic')]",
 
         "vmClientName": "OnPrem-Client",
-        "vmClientpipname": "OnPrem-Client-pip",
+        "vmClientpipname": "[concat(variables('vmClientName'), '-pip')]",
         "vmClientVmSize": "Standard_B4ms",
         "vmClientosdisktype": "Premium_LRS",
-        "vmClientNicName": "[concat(variables('vmClientName'), 'NetworkInterface')]",
+        "vmClientNicName": "[concat(variables('vmClientName'), '-nic')]",
 
         "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/DC.zip",
         "DSCDCfilename": "DC.ps1",
@@ -88,14 +89,14 @@
 
     },
     "resources": [
-        
+
         {
             "name": "vnet",
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "apiVersion": "2018-10-01",
             "dependsOn": [
-                
+
             ],
             "tags": {
                 "displayName": "vnet"
@@ -413,12 +414,12 @@
             "name": "[variables('ANFAccountname')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmDCName'), 'Microsoft.Powershell.DSC')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmClientName'), 'Microsoft.Powershell.DSC')]"
             ],
             "properties": {
                 "activeDirectories": [
                     {
-                        "username": "[parameters('AdminUsername')]",
+                        "username": "[parameters('AdminUserName')]",
                         "password": "[parameters('AdminPassword')]",
                         "domain": "[parameters('DomainName')]",
                         "dns": "[variables('vmDCstaticprivip')]",
@@ -444,7 +445,7 @@
         {
             "type": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
             "apiVersion": "2019-11-01",
-            "name": "[concat(variables('ANFAccountname'), '/', variables('ANFPoolname'), '/', variables('ANFVolumeName'))]",
+            "name": "[concat(variables('ANFAccountname'), '/', variables('ANFPoolname'), '/', variables('ANFVolumeNameNFS'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.NetApp/netAppAccounts/capacityPools', variables('ANFAccountname'), variables('ANFPoolname'))]",
@@ -455,12 +456,24 @@
                 "creationToken": "vol",
                 "usageThreshold": "[variables('ANFVolumesize')]",
                 "protocolTypes": [
-                    "CIFS"
+                    "NFSv3"
                 ],
+                "exportPolicy": {
+                    "rules": [
+                        {
+                            "ruleIndex": 1,
+                            "unixReadWrite": true,
+                            "nfsv3": true,
+                            "allowedClients": "[variables('vmClientstaticprivip')]"
+                        }
+                    ]
+                },
                 "subnetId": "[variables('vnetSubnetANFRef')]"
-                
+
             }
         }
+
+
 
 
     ],
