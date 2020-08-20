@@ -8,8 +8,8 @@
             "defaultValue": "vmadmin"
         },
         "AdminPassword": {
-            "type": "securestring",
-            "defaultValue": "$ecurity#123"
+            "type": "securestring"
+            
         },
         "WindowsOSVersion": {
             "type": "string",
@@ -17,8 +17,7 @@
         },
         "dnsLabel1": {
             "type": "string",
-            "minLength": 1,
-            "defaultValue": "onpremjlo"
+            "minLength": 1
         }
 
     },
@@ -59,9 +58,11 @@
         {
             "type": "Microsoft.Migrate/MigrateProjects/Solutions",
             "apiVersion": "2018-09-01-preview",
-            "name": "[concat(variables('migrateprojectname'), '/Servers-Assessment-ServerAssessment')]",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Assessment')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]"
+
             ],
             "properties": {
                 "tool": "ServerAssessment",
@@ -78,9 +79,10 @@
         {
             "type": "Microsoft.Migrate/MigrateProjects/Solutions",
             "apiVersion": "2018-09-01-preview",
-            "name": "[concat(variables('migrateprojectname'), '/Servers-Discovery-ServerDiscovery')]",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Discovery')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]"
             ],
             "properties": {
                 "tool": "ServerDiscovery",
@@ -98,9 +100,10 @@
         {
             "type": "Microsoft.Migrate/MigrateProjects/Solutions",
             "apiVersion": "2018-09-01-preview",
-            "name": "[concat(variables('migrateprojectname'), '/Servers-Migration-ServerMigration')]",
+            "name": "[concat(variables('migrateprojectname'), '/Servers-Migration')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]"
+                "[resourceId('Microsoft.Migrate/MigrateProjects', variables('migrateprojectname'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vm1Name'))]"
             ],
             "properties": {
                 "tool": "ServerMigration",
