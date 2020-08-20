@@ -9,7 +9,7 @@
 
 ## Azure Migrate Demo Environment - ARM Template
 
-![azuremigrate](https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrate.jpg "Azure Migrate")
+![azuremigrate](https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/doc/AzureMigrate.jpg "Azure Migrate")
 
 ### The ARM Template provides
 * Azure Virtual Machine with Hyper-V installed and configured
@@ -19,7 +19,7 @@
 
 The download and import jobs will take some time (about 45 minutes)... the deployment is complete when both nested vms are up & running.
 
-![azuremigrate](https://azuremigratedemo.blob.core.windows.net/vms/AzureMigrateDemo.png "Azure Migrate")
+![azuremigrate](https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-AzureMigrate/doc/AzureMigrateDemo.png "Azure Migrate")
 
 ### Instructions
 1. Deploy the ARM template to your subscription (choose a unique DNS name to your liking)
