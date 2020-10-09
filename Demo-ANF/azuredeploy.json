@@ -1,44 +1,7 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "AdminUsername": {
-            "type": "string",
-            "minLength": 1,
-            "defaultValue": "vmadmin",
-            "metadata": {
-                "description": "Name of the Administrator User for all machines"
-            }
-        },
-        "AdminPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Password for all machines (and AD Restore)"
-            }
-        },
-        "DNSNameDC": {
-            "type": "string",
-            "minLength": 1,
-            "metadata": {
-                "description": "Unique DNS Label for the Domain Controller"
-            }
-        },
-        "DNSNameClient": {
-            "type": "string",
-            "minLength": 1,
-            "metadata": {
-                "description": "Unique DNS Label for the Client"
-            }
-        },
-        "DomainName": {
-            "type": "string",
-            "minLength": 1,
-            "metadata": {
-                "description": "Your AD Domain"
-            }
-        }
-
-    },
+    "parameters": {},
     "variables": {
         "vnetPrefix": "10.20.0.0/16",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -49,7 +12,7 @@
         "vnetSubnetClientsName": "subnetclients",
         "vnetSubnetANFName": "subnetanf",
 
-        "vnetSubnetClientsRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetClientsName'))]",
+
         "vnetSubnetANFRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetANFName'))]",
 
         "vmDCstaticprivip": "10.20.0.4",
@@ -57,36 +20,11 @@
 
         "ANFAccountname": "ANFAccount",
         "ANFPoolname": "ANFPool",
-        "ANFVolumeNameCIFS": "ANFCIFSVolume",
+
         "ANFVolumeNameNFS": "ANFNFSVolume",
-        "ANFPrefix": "ANFSMB",
+
         "ANFPoolsize": 4398046511104,
-        "ANFVolumesize": 107374182400,
-
-        "vmImagePublisher": "MicrosoftWindowsServer",
-        "vmImageOffer": "WindowsServer",
-        "WindowsOSVersion": "2019-Datacenter",
-
-        "vmDCName": "OnPrem-DC",
-        "vmDCpipname": "[concat(variables('vmDCName'), '-pip')]",
-        "vmDCVmSize": "Standard_B4ms",
-        "vmDCosdisktype": "Premium_LRS",
-        "vmDCNicName": "[concat(variables('vmDCName'), '-nic')]",
-
-        "vmClientName": "OnPrem-Client",
-        "vmClientpipname": "[concat(variables('vmClientName'), '-pip')]",
-        "vmClientVmSize": "Standard_B4ms",
-        "vmClientosdisktype": "Premium_LRS",
-        "vmClientNicName": "[concat(variables('vmClientName'), '-nic')]",
-
-        "DSCDCurl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/DC.zip",
-        "DSCDCfilename": "DC.ps1",
-        "DSCDCfunction": "DC",
-
-        "DSCClienturl": "https://github.com/GetVirtual/Azure-ARM/raw/master/Demo-Azure-NetApp-Files/DSC/Client.zip",
-        "DSCClientname": "Client.ps1",
-        "DSCClientfunction": "Client"
-
+        "ANFVolumesize": 107374182400
     },
     "resources": [
 
@@ -139,294 +77,15 @@
             }
         },
         {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('vmDCpipname')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsNameDC')]"
-                }
-            },
-            "tags": {
-                "displayName": "vmDCpip"
-            }
-        },
-
-        {
-            "name": "[variables('vmDCNicName')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2018-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmDCpipname'))]"
-            ],
-            "tags": {
-                "displayName": "vmDCNic"
-            },
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAddress": "[variables('vmDCstaticprivip')]",
-                            "privateIPAllocationMethod": "Static",
-                            "subnet": {
-                                "id": "[variables('vnetSubnetClientsRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmDCpipname'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "name": "[variables('vmDCName')]",
-            "type": "Microsoft.Compute/virtualMachines",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2017-03-30",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDCNicName'))]"
-            ],
-            "tags": {
-                "displayName": "vmDC"
-            },
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[variables('vmDCVmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[variables('vmDCName')]",
-                    "adminUsername": "[parameters('AdminUserName')]",
-                    "adminPassword": "[parameters('AdminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('vmImagePublisher')]",
-                        "offer": "[variables('vmImageOffer')]",
-                        "sku": "[variables('WindowsOSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "name": "OnPrem-DC-Disk",
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "managedDisk": {
-                            "storageAccountType": "[variables('vmDCosdisktype')]"
-                        },
-                        "diskSizeGB": 512
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDCNicName'))]"
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmDCName'), '/Microsoft.Powershell.DSC')]",
-            "apiVersion": "2018-06-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmDCName'))]"
-
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.76",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "configuration": {
-                        "url": "[variables('DSCDCurl')]",
-                        "script": "[variables('DSCDCfilename')]",
-                        "function": "[variables('DSCDCfunction')]"
-                    },
-                    "configurationArguments": {
-                        "CARootName": "[variables('vmDCName')]",
-                        "domainname": "[parameters('domainname')]"
-                    }
-                },
-                "protectedSettings": {
-                    "configurationArguments": {
-                        "domainCred": {
-                            "userName": "[parameters('AdminUserName')]",
-                            "password": "[parameters('AdminPassword')]"
-                        },
-                        "safemodeCred": {
-                            "userName": "pwdonly",
-                            "password": "[parameters('AdminPassword')]"
-                        }
-                    }
-                }
-
-
-            },
-
-            "tags": {
-                "displayName": "vmDCextdsc"
-            }
-        },
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('vmClientpipname')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsNameClient')]"
-                }
-            },
-            "tags": {
-                "displayName": "vmClientpip"
-            }
-        },
-
-        {
-            "name": "[variables('vmClientNicName')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2018-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('vmClientpipname'))]"
-            ],
-            "tags": {
-                "displayName": "vmClientNic"
-            },
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAddress": "[variables('vmClientstaticprivip')]",
-                            "privateIPAllocationMethod": "Static",
-                            "subnet": {
-                                "id": "[variables('vnetSubnetClientsRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmClientpipname'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "name": "[variables('vmClientName')]",
-            "type": "Microsoft.Compute/virtualMachines",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "2017-03-30",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmClientNicName'))]"
-            ],
-            "tags": {
-                "displayName": "vmClient"
-            },
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[variables('vmClientVmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[variables('vmClientName')]",
-                    "adminUsername": "[parameters('AdminUserName')]",
-                    "adminPassword": "[parameters('AdminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('vmImagePublisher')]",
-                        "offer": "[variables('vmImageOffer')]",
-                        "sku": "[variables('WindowsOSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "name": "OnPrem-Client-Disk",
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "managedDisk": {
-                            "storageAccountType": "[variables('vmClientosdisktype')]"
-                        },
-                        "diskSizeGB": 512
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmClientNicName'))]"
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmClientName'), '/Microsoft.Powershell.DSC')]",
-            "apiVersion": "2018-06-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmClientName'))]"
-
-
-            ],
-            "properties": {
-                "publisher": "Microsoft.Powershell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.76",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "configuration": {
-                        "url": "[variables('DSCClienturl')]",
-                        "script": "[variables('DSCClientname')]",
-                        "function": "[variables('DSCClientfunction')]"
-                    },
-                    "configurationArguments": {
-                        "domainname": "[parameters('domainname')]",
-                        "nodename": "[variables('vmClientName')]"
-                    }
-                },
-                "protectedSettings": {
-                    "configurationArguments": {
-                        "domainCred": {
-                            "userName": "[concat(parameters('AdminUserName'), '@', parameters('domainname'))]",
-                            "password": "[parameters('AdminPassword')]"
-                        }
-
-                    }
-                }
-            },
-            "tags": {
-                "displayName": "vmClientextdsc"
-            }
-        },
-        {
             "type": "Microsoft.NetApp/netAppAccounts",
             "apiVersion": "2019-11-01",
             "name": "[variables('ANFAccountname')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', variables('vmClientName'), 'Microsoft.Powershell.DSC')]"
+
             ],
             "properties": {
-                "activeDirectories": [
-                    {
-                        "username": "[parameters('AdminUserName')]",
-                        "password": "[parameters('AdminPassword')]",
-                        "domain": "[parameters('DomainName')]",
-                        "dns": "[variables('vmDCstaticprivip')]",
-                        "smbServerName": "[variables('ANFPrefix')]",
-                        "organizationalUnit": "CN=Computers"
-                    }
-                ]
+
             }
         },
         {
