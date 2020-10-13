@@ -1,5 +1,6 @@
-var saname      = 'bicepstoragejl123'       
-var vnetname    = 'VNET-biceps'
+param saname string = 'bicepstoragejl123'
+
+var vnetname    = 'VNET-bicep'
 var vnetadressprefix = '10.140.0.0/24'
 
 resource sta 'Microsoft.Storage/storageAccounts@2019-06-01' = {
@@ -35,4 +36,3 @@ resource vnet 'Microsoft.Network/virtualNetworks@2018-10-01' = {
       ]
     }
   }
-

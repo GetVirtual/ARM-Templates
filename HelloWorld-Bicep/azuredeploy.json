@@ -1,18 +1,22 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "saname": {
+      "type": "string",
+      "defaultValue": "bicepstoragejl123"
+    }
+  },
   "functions": [],
   "variables": {
-    "saname": "bicepstoragejl123",
-    "vnetname": "VNET-biceps",
+    "vnetname": "VNET-bicep",
     "vnetadressprefix": "10.140.0.0/24"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2019-06-01",
-      "name": "[variables('saname')]",
+      "name": "[parameters('saname')]",
       "location": "[resourceGroup().location]",
       "kind": "Storage",
       "sku": {
@@ -37,7 +41,7 @@
         "enableDdosProtection": false,
         "subnets": [
           {
-            "name": "subnet001",
+            "name": "default",
             "properties": {
               "addressPrefix": "[variables('vnetadressprefix')]"
             }
