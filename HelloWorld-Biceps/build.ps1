@@ -1,0 +1,1 @@
+bicep build azuredeploy.bicep
