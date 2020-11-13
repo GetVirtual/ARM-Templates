@@ -4,7 +4,7 @@
     "parameters": {},
     "variables": {
         "vnetPrefix": "10.20.0.0/16",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'ANF-ARM-VNET')]",
 
         "vnetSubnetClientsPrefix": "10.20.0.0/24",
         "vnetSubnetANFPrefix": "10.20.1.0/24",
@@ -12,9 +12,6 @@
         "vnetSubnetClientsName": "Clients",
         "vnetSubnetANFName": "ANF",
         "vnetSubnetANFRef": "[concat(variables('vnetID'), '/subnets/', variables('vnetSubnetANFName'))]",
-
-        "vmDCstaticprivip": "10.20.0.4",
-        "vmClientstaticprivip": "10.20.0.5",
 
         "ANFAccountname": "ANFAccount",
         "ANFPoolname": "ANFPool",
@@ -44,8 +41,6 @@
                 },
                 "dhcpOptions": {
                     "dnsServers": [
-                        "[variables('vmDCstaticprivip')]",
-                        "168.63.129.16"
                     ]
                 },
                 "subnets": [
@@ -62,7 +57,7 @@
                             "addressPrefix": "[variables('vnetSubnetANFPrefix')]",
                             "delegations": [
                                 {
-                                    "name": "54b7fd98b87347e3855a5748025be27a",
+                                    "name": "ANFDelegation",
                                     "properties": {
                                         "serviceName": "Microsoft.Netapp/volumes"
                                     }
@@ -120,7 +115,7 @@
                             "ruleIndex": 1,
                             "unixReadWrite": true,
                             "nfsv3": true,
-                            "allowedClients": "[variables('vmClientstaticprivip')]"
+                            "allowedClients": "0.0.0.0"
                         }
                     ]
                 },
