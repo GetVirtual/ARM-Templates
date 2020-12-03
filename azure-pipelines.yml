@@ -21,7 +21,7 @@ steps:
     resourceGroupName: 'Demo-MultiRegion-HA'
     location: 'Germany West Central'
     templateLocation: 'Linked artifact'
-    csmFile: 'azuredeploy.json'
+    csmFile: 'Demo-AzureMigrate/azuredeploy.json'
     deploymentMode: 'Incremental'
 
 - script: |
