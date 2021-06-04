@@ -1,3 +1,6 @@
+# VM IMAGE SOURCE DEACTIVATED FOR NOW - AS SUCH ARM TEMPLATE NOT FUNCTIONAL #
+
+
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FGetVirtual%2FAzure-ARM%2Fmaster%2FDemo-AzureMigrate%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
